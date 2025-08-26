@@ -1,0 +1,14 @@
+bin/
+obj/
+.vs/
+.vscode/
+*.user
+*.suo
+*.cache
+Thumbs.db
+.DS_Store
+node_modules/
+wwwroot/lib/
+appsettings.Development.json
+dbconfig.json
+*.log

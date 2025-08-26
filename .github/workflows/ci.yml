@@ -1,0 +1,19 @@
+name: CI
+on:
+  push:
+    branches: [ main ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+      - name: Restore dependencies
+        run: dotnet restore src/Web/Dairy.Web.csproj
+      - name: Build
+        run: dotnet build src/Web/Dairy.Web.csproj --no-restore
+      - name: Test
+        run: dotnet test tests --no-build
