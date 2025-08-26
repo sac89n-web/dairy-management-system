@@ -207,8 +207,9 @@ app.MapGet("/api/test-db", async () => {
 // Health check endpoint
 app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
 
-app.Logger.LogInformation("Starting Dairy Management System on {Urls}", string.Join(", ", app.Urls));
-app.Run();
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+app.Logger.LogInformation("Starting Dairy Management System on port {Port}", port);
+app.Run($"http://0.0.0.0:{port}");
 
 // Marker classes for DI
 namespace Dairy.Application { public class ApplicationMarker { } }
