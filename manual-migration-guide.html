@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manual Database Migration Guide</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .step { margin: 20px 0; padding: 15px; background: #f5f5f5; border-radius: 5px; }
+        code { background: #e8e8e8; padding: 2px 5px; border-radius: 3px; font-family: monospace; }
+        .command { background: #2d3748; color: #e2e8f0; padding: 10px; border-radius: 5px; font-family: monospace; }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 5px; }
+        .warning { background: #fff3cd; border: 1px solid #ffeaa7; padding: 10px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Manual Database Migration Guide</h1>
+    
+    <div class="step">
+        <h3>Option 1: Using pg_dump (Recommended)</h3>
+        <p>If you have PostgreSQL client tools installed:</p>
+        <div class="command">
+# Extract schema from local database
+set PGPASSWORD=admin123
+pg_dump -h localhost -U admin -d postgres -n dairy --schema-only --no-owner --no-privileges -f schema.sql
+
+# Extract data from local database  
+pg_dump -h localhost -U admin -d postgres -n dairy --data-only --no-owner --no-privileges -f data.sql
+        </div>
+        <p>Then combine both files and run on Railway PostgreSQL</p>
+    </div>
+    
+    <div class="step">
+        <h3>Option 2: Using PowerShell Script</h3>
+        <p>Run the PowerShell script I created:</p>
+        <div class="command">PowerShell -ExecutionPolicy Bypass -File extract-schema.ps1</div>
+    </div>
+    
+    <div class="step">
+        <h3>Option 3: Manual SQL Export</h3>
+        <p>Connect to your local PostgreSQL and run these queries to get table definitions:</p>
+        <div class="command">
+-- Get all table structures
+SELECT 
+    'CREATE TABLE dairy.' || table_name || ' (' ||
+    string_agg(
+        column_name || ' ' || 
+        CASE 
+            WHEN data_type = 'character varying' THEN 'VARCHAR(' || character_maximum_length || ')'
+            WHEN data_type = 'integer' THEN 'INTEGER'
+            WHEN data_type = 'numeric' THEN 'DECIMAL(10,2)'
+            ELSE upper(data_type)
+        END ||
+        CASE WHEN is_nullable = 'NO' THEN ' NOT NULL' ELSE '' END,
+        ', '
+    ) || ');'
+FROM information_schema.columns 
+WHERE table_schema = 'dairy'
+GROUP BY table_name
+ORDER BY table_name;
+
+-- Get all data
+SELECT 'SELECT * FROM dairy.' || table_name || ';' 
+FROM information_schema.tables 
+WHERE table_schema = 'dairy';
+        </div>
+    </div>
+    
+    <div class="step">
+        <h3>Apply to Railway</h3>
+        <p>Once you have the migration script:</p>
+        <ol>
+            <li>Go to Railway dashboard → PostgreSQL service → Query tab</li>
+            <li>Paste the migration script</li>
+            <li>Execute it</li>
+        </ol>
+    </div>
+    
+    <div class="success">
+        <h3>Railway Connection Details</h3>
+        <p><strong>Host:</strong> turntable.proxy.rlwy.net</p>
+        <p><strong>Port:</strong> 19238</p>
+        <p><strong>Database:</strong> railway</p>
+        <p><strong>Username:</strong> postgres</p>
+        <p><strong>Password:</strong> TpXnyLAYfIJjZtsIcxNDWnICnwtUpDyC</p>
+    </div>
+    
+    <div class="warning">
+        <h3>Alternative: Use pgAdmin or DBeaver</h3>
+        <ul>
+            <li>Connect to local PostgreSQL</li>
+            <li>Right-click dairy schema → Backup</li>
+            <li>Export as SQL file</li>
+            <li>Connect to Railway PostgreSQL</li>
+            <li>Import the SQL file</li>
+        </ul>
+    </div>
+</body>
+</html>

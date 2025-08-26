@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Railway Deployment Guide</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .step { margin: 20px 0; padding: 15px; background: #f5f5f5; border-radius: 5px; }
+        code { background: #e8e8e8; padding: 2px 5px; border-radius: 3px; }
+        .warning { background: #fff3cd; border: 1px solid #ffeaa7; padding: 10px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Railway Deployment Guide</h1>
+    
+    <div class="step">
+        <h3>1. Create Railway Account</h3>
+        <p>Go to <a href="https://railway.app">railway.app</a> and sign up with GitHub</p>
+    </div>
+    
+    <div class="step">
+        <h3>2. Deploy Database</h3>
+        <p>Click "New Project" → "Provision PostgreSQL"<br>
+        Note the connection details from Variables tab</p>
+    </div>
+    
+    <div class="step">
+        <h3>3. Deploy Web App</h3>
+        <p>Click "New Project" → "Deploy from GitHub repo"<br>
+        Select this repository<br>
+        Railway will auto-detect the Dockerfile</p>
+    </div>
+    
+    <div class="step">
+        <h3>4. Set Environment Variables</h3>
+        <code>DATABASE_URL=postgresql://username:password@host:port/database</code><br>
+        <code>JWT_SECRET_KEY=your-super-secret-jwt-key-here-minimum-32-characters</code><br>
+        <code>ASPNETCORE_ENVIRONMENT=Production</code>
+    </div>
+    
+    <div class="step">
+        <h3>5. Initialize Database</h3>
+        <p>Connect to PostgreSQL using Railway's built-in Query tool<br>
+        Run the script from <code>Scripts/railway-init.sql</code></p>
+    </div>
+    
+    <div class="step">
+        <h3>6. Access Your App</h3>
+        <p>Railway will provide a public URL<br>
+        Login with: <strong>admin / admin123</strong></p>
+    </div>
+    
+    <div class="warning">
+        <h3>Free Tier Limits</h3>
+        <ul>
+            <li>500 hours/month execution time</li>
+            <li>1GB RAM</li>
+            <li>1GB disk space</li>
+            <li>Sleeps after 30min inactivity</li>
+        </ul>
+    </div>
+    
+    <h3>Troubleshooting</h3>
+    <ul>
+        <li>Check logs in Railway dashboard</li>
+        <li>Ensure DATABASE_URL format is correct</li>
+        <li>Verify all environment variables are set</li>
+    </ul>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Deploy Dairy Management System to Railway</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .step { margin: 20px 0; padding: 15px; background: #f5f5f5; border-radius: 5px; }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 5px; }
+        .warning { background: #fff3cd; border: 1px solid #ffeaa7; padding: 10px; border-radius: 5px; }
+        code { background: #e8e8e8; padding: 2px 5px; border-radius: 3px; font-family: monospace; }
+        .env-vars { background: #2d3748; color: #e2e8f0; padding: 15px; border-radius: 5px; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>Deploy Dairy Management System to Railway</h1>
+    
+    <div class="success">
+        <h3>✅ Prerequisites Complete</h3>
+        <ul>
+            <li>Database schema migrated to Railway PostgreSQL</li>
+            <li>Application configured for Railway deployment</li>
+            <li>Docker configuration ready</li>
+        </ul>
+    </div>
+    
+    <div class="step">
+        <h3>Step 1: Push Code to GitHub</h3>
+        <ol>
+            <li>Create a new repository on GitHub</li>
+            <li>Push your code:
+                <div class="env-vars">
+git init
+git add .
+git commit -m "Initial commit - Dairy Management System"
+git branch -M main
+git remote add origin https://github.com/yourusername/dairy-management.git
+git push -u origin main
+                </div>
+            </li>
+        </ol>
+    </div>
+    
+    <div class="step">
+        <h3>Step 2: Deploy Web Application</h3>
+        <ol>
+            <li>Go to <a href="https://railway.app" target="_blank">railway.app</a></li>
+            <li>Click "New Project"</li>
+            <li>Select "Deploy from GitHub repo"</li>
+            <li>Choose your dairy-management repository</li>
+            <li>Railway will auto-detect the Dockerfile and deploy</li>
+        </ol>
+    </div>
+    
+    <div class="step">
+        <h3>Step 3: Set Environment Variables</h3>
+        <p>In Railway dashboard → Your Web Service → Variables, add:</p>
+        <div class="env-vars">
+DATABASE_URL=postgresql://postgres:TpXnyLAYfIJjZtsIcxNDWnICnwtUpDyC@turntable.proxy.rlwy.net:19238/railway
+JWT_SECRET_KEY=your-super-secret-jwt-key-here-minimum-32-characters-long
+ASPNETCORE_ENVIRONMENT=Production
+ASPNETCORE_URLS=http://+:8080
+        </div>
+    </div>
+    
+    <div class="step">
+        <h3>Step 4: Verify Deployment</h3>
+        <ol>
+            <li>Wait for deployment to complete (2-3 minutes)</li>
+            <li>Railway will provide a public URL</li>
+            <li>Visit the URL to access your application</li>
+            <li>Test the health endpoint: <code>your-app-url/health</code></li>
+        </ol>
+    </div>
+    
+    <div class="warning">
+        <h3>Default Login Credentials</h3>
+        <p>Since we migrated the database, you'll need to create a user account or use the database login feature in your app.</p>
+    </div>
+    
+    <div class="step">
+        <h3>Step 5: Test Your Application</h3>
+        <ul>
+            <li>Access the main application</li>
+            <li>Test database connectivity</li>
+            <li>Verify milk collection features</li>
+            <li>Check sales functionality</li>
+            <li>Test report generation</li>
+        </ul>
+    </div>
+    
+    <div class="success">
+        <h3>🎉 Deployment Complete!</h3>
+        <p>Your Dairy Management System is now live on Railway with:</p>
+        <ul>
+            <li>PostgreSQL database with your migrated data</li>
+            <li>Web application with all features</li>
+            <li>Automatic SSL certificate</li>
+            <li>Health monitoring</li>
+        </ul>
+    </div>
+    
+    <div class="step">
+        <h3>Optional: Custom Domain</h3>
+        <ol>
+            <li>In Railway dashboard → Your service → Settings</li>
+            <li>Add your custom domain</li>
+            <li>Update DNS records as instructed</li>
+        </ol>
+    </div>
+</body>
+</html>

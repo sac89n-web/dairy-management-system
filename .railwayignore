@@ -1,0 +1,10 @@
+bin/
+obj/
+*.user
+*.suo
+*.cache
+.vs/
+logs/
+python-installer.exe
+*.binlog
+q-dev-chat-*.md

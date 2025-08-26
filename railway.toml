@@ -1,0 +1,8 @@
+[build]
+builder = "dockerfile"
+
+[deploy]
+startCommand = "dotnet Dairy.Web.dll"
+healthcheckPath = "/health"
+healthcheckTimeout = 300
+restartPolicyType = "on_failure"

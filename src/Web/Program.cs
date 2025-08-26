@@ -72,8 +72,16 @@ builder.Services.AddSingleton<Dairy.Web.Services.DatabaseSettingsService>();
 builder.Services.AddSingleton<SqlConnectionFactory>(sp =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? 
-                          Environment.GetEnvironmentVariable("DATABASE_URL") ??
-                          "Host=localhost;Database=postgres;Username=admin;Password=admin123;SearchPath=dairy";
+                          Environment.GetEnvironmentVariable("DATABASE_URL");
+    
+    // Convert Railway DATABASE_URL format if needed
+    if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("postgresql://"))
+    {
+        var uri = new Uri(connectionString);
+        connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.Trim('/')};Username={uri.UserInfo.Split(':')[0]};Password={uri.UserInfo.Split(':')[1]};SearchPath=dairy;SSL Mode=Require;Trust Server Certificate=true";
+    }
+    
+    connectionString ??= "Host=localhost;Database=postgres;Username=admin;Password=admin123;SearchPath=dairy";
     return new SqlConnectionFactory(connectionString);
 });
 
