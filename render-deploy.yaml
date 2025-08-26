@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: dairy-management-system
+    env: docker
+    repo: https://github.com/sac89n-web/dairy-management-system
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: JWT_SECRET_KEY
+        value: dairy-management-jwt-secret-key-2025-production-secure
+      - key: PORT
+        value: 10000
+  
+  - type: pserv
+    name: dairy-postgres
+    env: docker
+    repo: https://github.com/render-examples/postgresql
+    envVars:
+      - key: POSTGRES_DB
+        value: dairy_db
+      - key: POSTGRES_USER
+        value: dairy_user
+      - key: POSTGRES_PASSWORD
+        generateValue: true

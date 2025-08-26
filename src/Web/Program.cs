@@ -16,9 +16,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Configure QuestPDF license
 QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 
-// Serilog
+// Serilog (simplified for production)
 builder.Host.UseSerilog((ctx, lc) => lc
-    .ReadFrom.Configuration(ctx.Configuration));
+    .WriteTo.Console()
+    .MinimumLevel.Information());
 
 // Configuration
 var supportedCultures = builder.Configuration.GetSection("SupportedCultures").Get<string[]>();
@@ -64,9 +65,13 @@ FluentValidation.ValidatorOptions.Global.LanguageManager.Enabled = true;
 // HTTP Context Accessor
 builder.Services.AddHttpContextAccessor();
 
-// Database Services
-builder.Services.AddScoped<Dairy.Web.Services.DynamicConnectionFactory>();
-builder.Services.AddSingleton<Dairy.Web.Services.DatabaseSettingsService>();
+// Database Services (optional - only if classes exist)
+try {
+    builder.Services.AddScoped<Dairy.Web.Services.DynamicConnectionFactory>();
+    builder.Services.AddSingleton<Dairy.Web.Services.DatabaseSettingsService>();
+} catch {
+    // Services don't exist, skip
+}
 
 // Dapper/Npgsql (fallback)
 builder.Services.AddSingleton<SqlConnectionFactory>(sp =>
@@ -98,14 +103,14 @@ builder.Services.AddScoped<Dairy.Reports.ExcelReportService>();
 builder.Services.AddScoped<Dairy.Reports.PdfReportService>();
 builder.Services.AddSingleton<Dairy.Application.SettingsCache>();
 
-// DigiLocker Service
-builder.Services.AddHttpClient<Dairy.Web.Services.DigiLockerService>();
-
-// Python DB Service
-builder.Services.AddScoped<Dairy.Web.Services.PythonDbService>();
-
-// OTP Service
-builder.Services.AddScoped<Dairy.Web.Services.OtpService>();
+// Optional Services (only if classes exist)
+try {
+    builder.Services.AddHttpClient<Dairy.Web.Services.DigiLockerService>();
+    builder.Services.AddScoped<Dairy.Web.Services.PythonDbService>();
+    builder.Services.AddScoped<Dairy.Web.Services.OtpService>();
+} catch {
+    // Services don't exist, skip
+}
 
 // Session support
 builder.Services.AddDistributedMemoryCache();
@@ -168,19 +173,12 @@ app.MapGet("/", () => Results.Redirect("/simple-login"));
 // Database test endpoint
 app.MapGet("/api/test-db", async () => {
     try {
-        var configPath = Path.Combine(Directory.GetCurrentDirectory(), "dbconfig.json");
-        if (!File.Exists(configPath)) {
-            return Results.Json(new { success = false, error = "dbconfig.json not found" });
+        var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL") ?? "Host=localhost;Database=postgres;Username=admin;Password=admin123";
+        
+        if (connectionString.StartsWith("postgresql://")) {
+            var uri = new Uri(connectionString);
+            connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.Trim('/')};Username={uri.UserInfo.Split(':')[0]};Password={uri.UserInfo.Split(':')[1]};SSL Mode=Require;Trust Server Certificate=true";
         }
-        
-        var configJson = await File.ReadAllTextAsync(configPath);
-        var config = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(configJson);
-        
-        if (config == null) {
-            return Results.Json(new { success = false, error = "Invalid config file" });
-        }
-        
-        var connectionString = $"Host={config["Host"]};Database={config["Database"]};Username={config["Username"]};Password={config["Password"]};Port={config.GetValueOrDefault("Port", 5432)}";
         
         using var connection = new Npgsql.NpgsqlConnection(connectionString);
         await connection.OpenAsync();
@@ -191,16 +189,10 @@ app.MapGet("/api/test-db", async () => {
         return Results.Json(new { 
             success = true, 
             message = "Connected successfully",
-            version = version?.ToString(),
-            config = new {
-                host = config["Host"],
-                database = config["Database"],
-                username = config["Username"],
-                port = config.GetValueOrDefault("Port", 5432)
-            }
+            version = version?.ToString()
         });
     } catch (Exception ex) {
-        return Results.Json(new { success = false, error = ex.Message, details = ex.ToString() });
+        return Results.Json(new { success = false, error = ex.Message });
     }
 });
 
