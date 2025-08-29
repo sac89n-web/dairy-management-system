@@ -1,0 +1,118 @@
+2025-08-29 16:09:29.458 +05:30 [INF] User profile is available. Using 'C:\Users\admin\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2025-08-29 16:09:29.551 +05:30 [INF] Starting Dairy Management System on 
+2025-08-29 16:09:29.619 +05:30 [INF] Now listening on: http://localhost:5000
+2025-08-29 16:09:29.620 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2025-08-29 16:09:29.620 +05:30 [INF] Hosting environment: Development
+2025-08-29 16:09:29.620 +05:30 [INF] Content root path: e:\Sachin\Projects\Dairy Milk Collection & Sales Management System\src\Web
+2025-08-29 16:09:40.672 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5000/ - null null
+2025-08-29 16:09:40.677 +05:30 [INF] Accessing expired session, Key:201214df-c1d5-7bfa-562c-2e790e0dbf1d
+2025-08-29 16:09:40.690 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5000/ - 302 0 null 18.095ms
+2025-08-29 16:09:40.697 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5000/simple-login - null null
+2025-08-29 16:09:40.698 +05:30 [INF] Accessing expired session, Key:201214df-c1d5-7bfa-562c-2e790e0dbf1d
+2025-08-29 16:09:40.701 +05:30 [WRN] Failed to determine the https port for redirect.
+2025-08-29 16:09:40.743 +05:30 [INF] Executing endpoint '/SimpleLogin'
+2025-08-29 16:09:40.754 +05:30 [INF] Route matched with {page = "/SimpleLogin", action = "", controller = ""}. Executing page /SimpleLogin
+2025-08-29 16:09:40.758 +05:30 [INF] Executing handler method SimpleLoginModel.OnGetAsync - ModelState is "Valid"
+2025-08-29 16:09:40.959 +05:30 [INF] Executed handler method OnGetAsync, returned result .
+2025-08-29 16:09:40.960 +05:30 [INF] Executing an implicit handler method - ModelState is "Valid"
+2025-08-29 16:09:40.960 +05:30 [INF] Executed an implicit handler method, returned result Microsoft.AspNetCore.Mvc.RazorPages.PageResult.
+2025-08-29 16:09:40.979 +05:30 [INF] Executed page /SimpleLogin in 223.5245ms
+2025-08-29 16:09:40.979 +05:30 [INF] Executed endpoint '/SimpleLogin'
+2025-08-29 16:09:40.981 +05:30 [INF] HTTP GET /simple-login responded 200 in 280.4396 ms
+2025-08-29 16:09:40.982 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5000/simple-login - 200 null text/html; charset=utf-8 285.2771ms
+2025-08-29 16:09:41.228 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5000/favicon.ico - null null
+2025-08-29 16:09:41.229 +05:30 [INF] Accessing expired session, Key:201214df-c1d5-7bfa-562c-2e790e0dbf1d
+2025-08-29 16:09:41.229 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5000/favicon.ico - 302 0 null 0.9747ms
+2025-08-29 16:09:41.237 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5000/simple-login - null null
+2025-08-29 16:09:41.237 +05:30 [INF] Accessing expired session, Key:201214df-c1d5-7bfa-562c-2e790e0dbf1d
+2025-08-29 16:09:41.241 +05:30 [INF] Executing endpoint '/SimpleLogin'
+2025-08-29 16:09:41.242 +05:30 [INF] Route matched with {page = "/SimpleLogin", action = "", controller = ""}. Executing page /SimpleLogin
+2025-08-29 16:09:41.242 +05:30 [INF] Executing handler method SimpleLoginModel.OnGetAsync - ModelState is "Valid"
+2025-08-29 16:09:41.286 +05:30 [INF] Executed handler method OnGetAsync, returned result .
+2025-08-29 16:09:41.286 +05:30 [INF] Executing an implicit handler method - ModelState is "Valid"
+2025-08-29 16:09:41.286 +05:30 [INF] Executed an implicit handler method, returned result Microsoft.AspNetCore.Mvc.RazorPages.PageResult.
+2025-08-29 16:09:41.290 +05:30 [INF] Executed page /SimpleLogin in 48.1837ms
+2025-08-29 16:09:41.290 +05:30 [INF] Executed endpoint '/SimpleLogin'
+2025-08-29 16:09:41.290 +05:30 [INF] HTTP GET /simple-login responded 200 in 52.7405 ms
+2025-08-29 16:09:41.290 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5000/simple-login - 200 null text/html; charset=utf-8 53.6131ms
+2025-08-29 16:09:46.524 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:5000/simple-login - application/x-www-form-urlencoded 215
+2025-08-29 16:09:46.524 +05:30 [INF] Accessing expired session, Key:201214df-c1d5-7bfa-562c-2e790e0dbf1d
+2025-08-29 16:09:46.530 +05:30 [INF] Executing endpoint '/SimpleLogin'
+2025-08-29 16:09:46.530 +05:30 [INF] Route matched with {page = "/SimpleLogin", action = "", controller = ""}. Executing page /SimpleLogin
+2025-08-29 16:09:46.558 +05:30 [INF] Executing handler method SimpleLoginModel.OnPostAsync - ModelState is "Valid"
+2025-08-29 16:09:46.613 +05:30 [INF] Executed handler method OnPostAsync, returned result Microsoft.AspNetCore.Mvc.RedirectToPageResult.
+2025-08-29 16:09:46.632 +05:30 [INF] Executing RedirectToPageResult, redirecting to /Dashboard.
+2025-08-29 16:09:46.632 +05:30 [INF] Executed page /SimpleLogin in 102.3354ms
+2025-08-29 16:09:46.632 +05:30 [INF] Executed endpoint '/SimpleLogin'
+2025-08-29 16:09:46.633 +05:30 [INF] HTTP POST /simple-login responded 302 in 108.3130 ms
+2025-08-29 16:09:46.633 +05:30 [INF] Session started; Key:201214df-c1d5-7bfa-562c-2e790e0dbf1d, Id:66a10a26-b145-c379-a5c7-6c88f938479b
+2025-08-29 16:09:46.636 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:5000/simple-login - 302 0 null 112.0022ms
+2025-08-29 16:09:46.644 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5000/Dashboard - null null
+2025-08-29 16:09:46.811 +05:30 [ERR] An unhandled exception has occurred while executing the request.
+Npgsql.PostgresException (0x80004005): 42P01: relation "dairy.users" does not exist
+
+POSITION: 15
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Dapper.SqlMapper.QueryRowAsync[T](IDbConnection cnn, Row row, Type effectiveType, CommandDefinition command) in /_/Dapper/SqlMapper.Async.cs:line 489
+   at Dairy.Infrastructure.AuthService.GetUserByIdAsync(Int32 userId) in e:\Sachin\Projects\Dairy Milk Collection & Sales Management System\src\Infrastructure\AuthService.cs:line 94
+   at Dairy.Web.Middleware.AuthorizationMiddleware.InvokeAsync(HttpContext context, IAuthService authService) in e:\Sachin\Projects\Dairy Milk Collection & Sales Management System\src\Web\Middleware\AuthorizationMiddleware.cs:line 37
+   at Microsoft.AspNetCore.Session.SessionMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Session.SessionMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddlewareImpl.Invoke(HttpContext context)
+  Exception data:
+    Severity: ERROR
+    SqlState: 42P01
+    MessageText: relation "dairy.users" does not exist
+    Position: 15
+    File: parse_relation.c
+    Line: 1431
+    Routine: parserOpenTable
+2025-08-29 16:09:46.860 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5000/Dashboard - 500 null text/html; charset=utf-8 216.018ms
+2025-08-29 16:09:46.913 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5000/favicon.ico - null null
+2025-08-29 16:09:46.938 +05:30 [ERR] An unhandled exception has occurred while executing the request.
+Npgsql.PostgresException (0x80004005): 42P01: relation "dairy.users" does not exist
+
+POSITION: 15
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Dapper.SqlMapper.QueryRowAsync[T](IDbConnection cnn, Row row, Type effectiveType, CommandDefinition command) in /_/Dapper/SqlMapper.Async.cs:line 489
+   at Dairy.Infrastructure.AuthService.GetUserByIdAsync(Int32 userId) in e:\Sachin\Projects\Dairy Milk Collection & Sales Management System\src\Infrastructure\AuthService.cs:line 94
+   at Dairy.Web.Middleware.AuthorizationMiddleware.InvokeAsync(HttpContext context, IAuthService authService) in e:\Sachin\Projects\Dairy Milk Collection & Sales Management System\src\Web\Middleware\AuthorizationMiddleware.cs:line 37
+   at Microsoft.AspNetCore.Session.SessionMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Session.SessionMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddlewareImpl.Invoke(HttpContext context)
+  Exception data:
+    Severity: ERROR
+    SqlState: 42P01
+    MessageText: relation "dairy.users" does not exist
+    Position: 15
+    File: parse_relation.c
+    Line: 1431
+    Routine: parserOpenTable
+2025-08-29 16:09:46.949 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5000/favicon.ico - 500 null text/plain; charset=utf-8 36.0083ms
+2025-08-29 16:09:50.409 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5000/simple-login - null null
+2025-08-29 16:09:50.410 +05:30 [INF] Executing endpoint '/SimpleLogin'
+2025-08-29 16:09:50.410 +05:30 [INF] Route matched with {page = "/SimpleLogin", action = "", controller = ""}. Executing page /SimpleLogin
+2025-08-29 16:09:50.410 +05:30 [INF] Executing handler method SimpleLoginModel.OnGetAsync - ModelState is "Valid"
+2025-08-29 16:09:50.503 +05:30 [INF] Executed handler method OnGetAsync, returned result .
+2025-08-29 16:09:50.503 +05:30 [INF] Executing an implicit handler method - ModelState is "Valid"
+2025-08-29 16:09:50.503 +05:30 [INF] Executed an implicit handler method, returned result Microsoft.AspNetCore.Mvc.RazorPages.PageResult.
+2025-08-29 16:09:50.505 +05:30 [INF] Executed page /SimpleLogin in 95.0504ms
+2025-08-29 16:09:50.505 +05:30 [INF] Executed endpoint '/SimpleLogin'
+2025-08-29 16:09:50.505 +05:30 [INF] HTTP GET /simple-login responded 302 in 95.6545 ms
+2025-08-29 16:09:50.505 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5000/simple-login - 302 null text/html; charset=utf-8 96.2372ms
+2025-08-29 16:09:50.528 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5000/favicon.ico - null null
+2025-08-29 16:09:50.553 +05:30 [INF] HTTP GET /favicon.ico responded 404 in 0.9279 ms
+2025-08-29 16:09:50.554 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5000/favicon.ico - 404 0 null 25.9206ms
+2025-08-29 16:09:50.554 +05:30 [INF] Request reached the end of the middleware pipeline without being handled by application code. Request path: GET http://localhost:5000/favicon.ico, Response status code: 404

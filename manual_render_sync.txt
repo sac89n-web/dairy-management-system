@@ -1,16 +1,12 @@
--- Commands to run on Render PostgreSQL console
--- Database ID: dpg-d2n0vah5pdvs739dpqe0-a
+MANUAL RENDER DATABASE SYNC STEPS:
 
--- 1. Install Render CLI:
-curl -fsSL https://cli.render.com/install | sh
+1. Go to https://dashboard.render.com
+2. Navigate to your PostgreSQL service (dpg-d2n0vah5pdvs739dpqe0-a)
+3. Click "Connect" → "External Connection"
+4. Use any PostgreSQL client (pgAdmin, DBeaver, etc.) with the connection details
+5. Or use the web-based SQL console in Render dashboard
 
--- 2. Login to Render:
-render auth login
-
--- 3. Connect to database:
-render psql dpg-d2n0vah5pdvs739dpqe0-a
-
--- 2. Then run these SQL commands:
+SQL TO RUN:
 CREATE SCHEMA IF NOT EXISTS dairy;
 
 CREATE TABLE IF NOT EXISTS dairy.users (
@@ -31,4 +27,4 @@ DO UPDATE SET
     password_hash = '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj3bp.gSInG2',
     updated_at = NOW();
 
--- This will sync admin password "admin123" to Render database
+This will set admin password to "admin123"

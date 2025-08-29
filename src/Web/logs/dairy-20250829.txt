@@ -2020,3 +2020,62 @@ System.InvalidOperationException: Unable to resolve service for type 'Dairy.Web.
 2025-08-29 16:03:14.987 +05:30 [INF] Executed endpoint '/SimpleLogin'
 2025-08-29 16:03:14.987 +05:30 [INF] HTTP POST /simple-login responded 200 in 187.9553 ms
 2025-08-29 16:03:14.987 +05:30 [INF] Request finished HTTP/2 POST https://localhost:5001/simple-login - 200 null text/html; charset=utf-8 189.0408ms
+2025-08-29 16:07:14.178 +05:30 [INF] User profile is available. Using 'C:\Users\admin\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2025-08-29 16:07:14.274 +05:30 [INF] Starting Dairy Management System on 
+2025-08-29 16:07:14.349 +05:30 [WRN] The ASP.NET Core developer certificate is not trusted. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert.
+2025-08-29 16:07:14.368 +05:30 [INF] Now listening on: https://localhost:5001
+2025-08-29 16:07:14.368 +05:30 [INF] Now listening on: http://localhost:5002
+2025-08-29 16:07:14.368 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2025-08-29 16:07:14.368 +05:30 [INF] Hosting environment: Development
+2025-08-29 16:07:14.368 +05:30 [INF] Content root path: e:\Sachin\Projects\Dairy Milk Collection & Sales Management System\src\Web
+2025-08-29 16:07:20.134 +05:30 [INF] Request starting HTTP/2 GET https://localhost:5001/simple-login - null null
+2025-08-29 16:07:20.140 +05:30 [INF] Accessing expired session, Key:201214df-c1d5-7bfa-562c-2e790e0dbf1d
+2025-08-29 16:07:20.203 +05:30 [INF] Executing endpoint '/SimpleLogin'
+2025-08-29 16:07:20.214 +05:30 [INF] Route matched with {page = "/SimpleLogin", action = "", controller = ""}. Executing page /SimpleLogin
+2025-08-29 16:07:20.219 +05:30 [INF] Executing handler method SimpleLoginModel.OnGetAsync - ModelState is "Valid"
+2025-08-29 16:07:20.312 +05:30 [INF] Executed handler method OnGetAsync, returned result .
+2025-08-29 16:07:20.313 +05:30 [INF] Executing an implicit handler method - ModelState is "Valid"
+2025-08-29 16:07:20.314 +05:30 [INF] Executed an implicit handler method, returned result Microsoft.AspNetCore.Mvc.RazorPages.PageResult.
+2025-08-29 16:07:20.337 +05:30 [INF] Executed page /SimpleLogin in 121.1385ms
+2025-08-29 16:07:20.339 +05:30 [INF] Executed endpoint '/SimpleLogin'
+2025-08-29 16:07:20.341 +05:30 [INF] HTTP GET /simple-login responded 200 in 188.8300 ms
+2025-08-29 16:07:20.344 +05:30 [INF] Request finished HTTP/2 GET https://localhost:5001/simple-login - 200 null text/html; charset=utf-8 210.7066ms
+2025-08-29 16:07:25.527 +05:30 [INF] Request starting HTTP/2 POST https://localhost:5001/simple-login - application/x-www-form-urlencoded 215
+2025-08-29 16:07:25.541 +05:30 [INF] Accessing expired session, Key:201214df-c1d5-7bfa-562c-2e790e0dbf1d
+2025-08-29 16:07:25.628 +05:30 [INF] Executing endpoint '/SimpleLogin'
+2025-08-29 16:07:25.628 +05:30 [INF] Route matched with {page = "/SimpleLogin", action = "", controller = ""}. Executing page /SimpleLogin
+2025-08-29 16:07:25.672 +05:30 [INF] Executing handler method SimpleLoginModel.OnPostAsync - ModelState is "Valid"
+2025-08-29 16:07:25.724 +05:30 [INF] Executed handler method OnPostAsync, returned result Microsoft.AspNetCore.Mvc.RedirectToPageResult.
+2025-08-29 16:07:25.742 +05:30 [INF] Executing RedirectToPageResult, redirecting to /Dashboard.
+2025-08-29 16:07:25.744 +05:30 [INF] Executed page /SimpleLogin in 115.2318ms
+2025-08-29 16:07:25.744 +05:30 [INF] Executed endpoint '/SimpleLogin'
+2025-08-29 16:07:25.744 +05:30 [INF] HTTP POST /simple-login responded 302 in 202.7545 ms
+2025-08-29 16:07:25.747 +05:30 [INF] Session started; Key:201214df-c1d5-7bfa-562c-2e790e0dbf1d, Id:43952b9f-66b7-2cb1-d155-380d6a5cf185
+2025-08-29 16:07:25.751 +05:30 [INF] Request finished HTTP/2 POST https://localhost:5001/simple-login - 302 0 null 223.6577ms
+2025-08-29 16:07:25.768 +05:30 [INF] Request starting HTTP/2 GET https://localhost:5001/Dashboard - null null
+2025-08-29 16:07:25.940 +05:30 [ERR] An unhandled exception has occurred while executing the request.
+Npgsql.PostgresException (0x80004005): 42P01: relation "dairy.users" does not exist
+
+POSITION: 15
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Dapper.SqlMapper.QueryRowAsync[T](IDbConnection cnn, Row row, Type effectiveType, CommandDefinition command) in /_/Dapper/SqlMapper.Async.cs:line 489
+   at Dairy.Infrastructure.AuthService.GetUserByIdAsync(Int32 userId) in e:\Sachin\Projects\Dairy Milk Collection & Sales Management System\src\Infrastructure\AuthService.cs:line 94
+   at Dairy.Web.Middleware.AuthorizationMiddleware.InvokeAsync(HttpContext context, IAuthService authService) in e:\Sachin\Projects\Dairy Milk Collection & Sales Management System\src\Web\Middleware\AuthorizationMiddleware.cs:line 37
+   at Microsoft.AspNetCore.Session.SessionMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Session.SessionMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddlewareImpl.Invoke(HttpContext context)
+  Exception data:
+    Severity: ERROR
+    SqlState: 42P01
+    MessageText: relation "dairy.users" does not exist
+    Position: 15
+    File: parse_relation.c
+    Line: 1431
+    Routine: parserOpenTable
+2025-08-29 16:07:25.987 +05:30 [INF] Request finished HTTP/2 GET https://localhost:5001/Dashboard - 500 null text/html; charset=utf-8 218.8618ms
