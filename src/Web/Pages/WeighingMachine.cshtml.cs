@@ -18,11 +18,6 @@ public class WeighingMachineModel : BasePageModel
 
     public async Task OnGetAsync()
     {
-        var sessionConnectionString = HttpContext.Session.GetString("ConnectionString");
-        var connectionString = !string.IsNullOrEmpty(sessionConnectionString) 
-            ? sessionConnectionString 
-            : "Host=localhost;Database=postgres;Username=admin;Password=admin123;SearchPath=dairy";
-            
         using var connection = GetConnection();
         
         Farmers = (await connection.QueryAsync<Farmer>(

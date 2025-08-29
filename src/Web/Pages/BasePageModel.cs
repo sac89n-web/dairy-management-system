@@ -1,15 +1,12 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Npgsql;
+using Dairy.Infrastructure;
 
 public class BasePageModel : PageModel
 {
     protected NpgsqlConnection GetConnection()
     {
-        var sessionConnectionString = HttpContext.Session.GetString("ConnectionString");
-        var connectionString = !string.IsNullOrEmpty(sessionConnectionString) 
-            ? sessionConnectionString 
-            : "Host=localhost;Database=postgres;Username=admin;Password=admin123;SearchPath=dairy";
-            
-        return new NpgsqlConnection(connectionString);
+        var connectionFactory = HttpContext.RequestServices.GetRequiredService<SqlConnectionFactory>();
+        return (NpgsqlConnection)connectionFactory.CreateConnection();
     }
 }
