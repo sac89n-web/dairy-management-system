@@ -5,21 +5,31 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Create a new minimal web project
-RUN dotnet new web -n DairyApp
-WORKDIR /src/DairyApp
+# Copy project files
+COPY src/Domain/Domain.csproj src/Domain/
+COPY src/Application/Application.csproj src/Application/
+COPY src/Infrastructure/Infrastructure.csproj src/Infrastructure/
+COPY src/Reports/Reports.csproj src/Reports/
+COPY src/Web/Dairy.Web.csproj src/Web/
 
-# Replace Program.cs with our content
-COPY src/Web/Program.cs ./Program.cs
+# Restore dependencies
+RUN dotnet restore src/Web/Dairy.Web.csproj
 
-# Build the project
-RUN dotnet build -c Release -o /app/build
+# Copy source code
+COPY src/ src/
+
+# Build
+RUN dotnet build src/Web/Dairy.Web.csproj -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish -c Release -o /app/publish
+RUN dotnet publish src/Web/Dairy.Web.csproj -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+# Environment variables for cloud deployment
+ENV ASPNETCORE_ENVIRONMENT=Production
 ENV ASPNETCORE_URLS=http://+:$PORT
-ENTRYPOINT ["dotnet", "DairyApp.dll"]
+
+ENTRYPOINT ["dotnet", "Dairy.Web.dll"]
