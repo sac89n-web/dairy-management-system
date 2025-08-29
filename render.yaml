@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: dairy-management
+    env: dotnet
+    buildCommand: dotnet publish src/Web/Dairy.Web.csproj -c Release -o out
+    startCommand: dotnet out/Dairy.Web.dll
+    healthCheckPath: /health
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: dairy-postgres
+          property: connectionString
+
+databases:
+  - name: dairy-postgres
+    databaseName: dairy_db
+    user: dairy_user

@@ -1,0 +1,134 @@
+2025-08-29 12:30:00.706 +05:30 [INF] User profile is available. Using 'C:\Users\admin\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2025-08-29 12:30:01.005 +05:30 [INF] Starting Dairy Management System on 
+2025-08-29 12:30:01.149 +05:30 [WRN] The ASP.NET Core developer certificate is not trusted. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert.
+2025-08-29 12:30:01.173 +05:30 [INF] Now listening on: https://localhost:5001
+2025-08-29 12:30:01.173 +05:30 [INF] Now listening on: http://localhost:5002
+2025-08-29 12:30:01.174 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2025-08-29 12:30:01.174 +05:30 [INF] Hosting environment: Development
+2025-08-29 12:30:01.174 +05:30 [INF] Content root path: E:\Sachin\Projects\Dairy Milk Collection & Sales Management System\src\Web
+2025-08-29 12:30:33.723 +05:30 [INF] Request starting HTTP/2 GET https://localhost:5001/ - null null
+2025-08-29 12:30:33.735 +05:30 [INF] Request finished HTTP/2 GET https://localhost:5001/ - 302 0 null 12.9716ms
+2025-08-29 12:30:33.743 +05:30 [INF] Request starting HTTP/2 GET https://localhost:5001/simple-login - null null
+2025-08-29 12:30:33.915 +05:30 [INF] Executing endpoint '/SimpleLogin'
+2025-08-29 12:30:33.970 +05:30 [INF] Route matched with {page = "/SimpleLogin", action = "", controller = ""}. Executing page /SimpleLogin
+2025-08-29 12:30:33.978 +05:30 [INF] Executing handler method SimpleLoginModel.OnGet - ModelState is "Valid"
+2025-08-29 12:30:33.979 +05:30 [INF] Executed handler method OnGet, returned result .
+2025-08-29 12:30:33.982 +05:30 [INF] Executing an implicit handler method - ModelState is "Valid"
+2025-08-29 12:30:33.982 +05:30 [INF] Executed an implicit handler method, returned result Microsoft.AspNetCore.Mvc.RazorPages.PageResult.
+2025-08-29 12:30:34.029 +05:30 [INF] Executed page /SimpleLogin in 56.157ms
+2025-08-29 12:30:34.030 +05:30 [INF] Executed endpoint '/SimpleLogin'
+2025-08-29 12:30:34.034 +05:30 [INF] HTTP GET /simple-login responded 200 in 275.9659 ms
+2025-08-29 12:30:34.039 +05:30 [INF] Request finished HTTP/2 GET https://localhost:5001/simple-login - 200 null text/html; charset=utf-8 295.8492ms
+2025-08-29 12:30:34.098 +05:30 [INF] Request starting HTTP/2 GET https://localhost:5001/favicon.ico - null null
+2025-08-29 12:30:34.099 +05:30 [INF] Request finished HTTP/2 GET https://localhost:5001/favicon.ico - 302 0 null 0.6253ms
+2025-08-29 12:30:34.105 +05:30 [INF] Request starting HTTP/2 GET https://localhost:5001/simple-login - null null
+2025-08-29 12:30:34.112 +05:30 [INF] Executing endpoint '/SimpleLogin'
+2025-08-29 12:30:34.112 +05:30 [INF] Route matched with {page = "/SimpleLogin", action = "", controller = ""}. Executing page /SimpleLogin
+2025-08-29 12:30:34.112 +05:30 [INF] Executing handler method SimpleLoginModel.OnGet - ModelState is "Valid"
+2025-08-29 12:30:34.112 +05:30 [INF] Executed handler method OnGet, returned result .
+2025-08-29 12:30:34.112 +05:30 [INF] Executing an implicit handler method - ModelState is "Valid"
+2025-08-29 12:30:34.113 +05:30 [INF] Executed an implicit handler method, returned result Microsoft.AspNetCore.Mvc.RazorPages.PageResult.
+2025-08-29 12:30:34.121 +05:30 [INF] Executed page /SimpleLogin in 8.7169ms
+2025-08-29 12:30:34.125 +05:30 [INF] Executed endpoint '/SimpleLogin'
+2025-08-29 12:30:34.126 +05:30 [INF] HTTP GET /simple-login responded 200 in 20.8392 ms
+2025-08-29 12:30:34.127 +05:30 [INF] Request finished HTTP/2 GET https://localhost:5001/simple-login - 200 null text/html; charset=utf-8 22.1434ms
+2025-08-29 12:30:39.765 +05:30 [INF] Request starting HTTP/2 POST https://localhost:5001/simple-login - application/x-www-form-urlencoded 215
+2025-08-29 12:30:39.770 +05:30 [INF] Executing endpoint '/SimpleLogin'
+2025-08-29 12:30:39.771 +05:30 [INF] Route matched with {page = "/SimpleLogin", action = "", controller = ""}. Executing page /SimpleLogin
+2025-08-29 12:30:39.791 +05:30 [INF] Executing handler method SimpleLoginModel.OnPostAsync - ModelState is "Valid"
+2025-08-29 12:30:39.796 +05:30 [INF] Executed handler method OnPostAsync, returned result Microsoft.AspNetCore.Mvc.RedirectToPageResult.
+2025-08-29 12:30:39.814 +05:30 [INF] Executing RedirectToPageResult, redirecting to /Dashboard.
+2025-08-29 12:30:39.814 +05:30 [INF] Executed page /SimpleLogin in 43.2109ms
+2025-08-29 12:30:39.814 +05:30 [INF] Executed endpoint '/SimpleLogin'
+2025-08-29 12:30:39.814 +05:30 [INF] HTTP POST /simple-login responded 302 in 48.9244 ms
+2025-08-29 12:30:39.817 +05:30 [INF] Session started; Key:d3f94366-6903-1f78-c8b0-2a1bfd820894, Id:8f44ab8d-65f0-e887-a1d6-875a3d6d5329
+2025-08-29 12:30:39.820 +05:30 [INF] Request finished HTTP/2 POST https://localhost:5001/simple-login - 302 0 null 55.1484ms
+2025-08-29 12:30:39.831 +05:30 [INF] Request starting HTTP/2 GET https://localhost:5001/Dashboard - null null
+2025-08-29 12:30:39.832 +05:30 [INF] Executing endpoint '/Dashboard'
+2025-08-29 12:30:39.837 +05:30 [INF] Route matched with {page = "/Dashboard", action = "", controller = ""}. Executing page /Dashboard
+2025-08-29 12:30:39.838 +05:30 [INF] Executing handler method DashboardModel.OnGetAsync - ModelState is "Valid"
+2025-08-29 12:30:40.594 +05:30 [INF] Executed handler method OnGetAsync, returned result .
+2025-08-29 12:30:40.595 +05:30 [INF] Executing an implicit handler method - ModelState is "Valid"
+2025-08-29 12:30:40.595 +05:30 [INF] Executed an implicit handler method, returned result Microsoft.AspNetCore.Mvc.RazorPages.PageResult.
+2025-08-29 12:30:40.624 +05:30 [INF] Executed page /Dashboard in 787.0739ms
+2025-08-29 12:30:40.624 +05:30 [INF] Executed endpoint '/Dashboard'
+2025-08-29 12:30:40.625 +05:30 [INF] HTTP GET /Dashboard responded 200 in 792.4977 ms
+2025-08-29 12:30:40.625 +05:30 [INF] Request finished HTTP/2 GET https://localhost:5001/Dashboard - 200 null text/html; charset=utf-8 793.224ms
+2025-08-29 12:30:40.700 +05:30 [INF] Request starting HTTP/2 GET https://localhost:5001/favicon.ico - null null
+2025-08-29 12:30:40.701 +05:30 [INF] HTTP GET /favicon.ico responded 404 in 0.9131 ms
+2025-08-29 12:30:40.702 +05:30 [INF] Request finished HTTP/2 GET https://localhost:5001/favicon.ico - 404 0 null 1.5076ms
+2025-08-29 12:30:40.702 +05:30 [INF] Request reached the end of the middleware pipeline without being handled by application code. Request path: GET https://localhost:5001/favicon.ico, Response status code: 404
+2025-08-29 12:30:43.598 +05:30 [INF] Request starting HTTP/2 GET https://localhost:5001/WeighingMachine - null null
+2025-08-29 12:30:43.598 +05:30 [INF] Executing endpoint '/WeighingMachine'
+2025-08-29 12:30:43.606 +05:30 [INF] Route matched with {page = "/WeighingMachine", action = "", controller = ""}. Executing page /WeighingMachine
+2025-08-29 12:30:43.606 +05:30 [INF] Executing handler method WeighingMachineModel.OnGetAsync - ModelState is "Valid"
+2025-08-29 12:30:43.666 +05:30 [INF] Executed handler method OnGetAsync, returned result .
+2025-08-29 12:30:43.666 +05:30 [INF] Executing an implicit handler method - ModelState is "Valid"
+2025-08-29 12:30:43.671 +05:30 [INF] Executed an implicit handler method, returned result Microsoft.AspNetCore.Mvc.RazorPages.PageResult.
+2025-08-29 12:30:43.695 +05:30 [INF] Executed page /WeighingMachine in 88.6838ms
+2025-08-29 12:30:43.695 +05:30 [INF] Executed endpoint '/WeighingMachine'
+2025-08-29 12:30:43.695 +05:30 [INF] HTTP GET /WeighingMachine responded 200 in 97.0398 ms
+2025-08-29 12:30:43.695 +05:30 [INF] Request finished HTTP/2 GET https://localhost:5001/WeighingMachine - 200 null text/html; charset=utf-8 97.5454ms
+2025-08-29 12:30:44.551 +05:30 [INF] Request starting HTTP/2 GET https://localhost:5001/MasterData - null null
+2025-08-29 12:30:44.551 +05:30 [INF] Executing endpoint '/MasterData'
+2025-08-29 12:30:44.562 +05:30 [INF] Route matched with {page = "/MasterData", action = "", controller = ""}. Executing page /MasterData
+2025-08-29 12:30:44.562 +05:30 [INF] Executing handler method MasterDataModel.OnGetAsync - ModelState is "Valid"
+2025-08-29 12:30:44.570 +05:30 [INF] Executed handler method OnGetAsync, returned result .
+2025-08-29 12:30:44.570 +05:30 [INF] Executing an implicit handler method - ModelState is "Valid"
+2025-08-29 12:30:44.570 +05:30 [INF] Executed an implicit handler method, returned result Microsoft.AspNetCore.Mvc.RazorPages.PageResult.
+2025-08-29 12:30:44.586 +05:30 [INF] Executed page /MasterData in 24.0402ms
+2025-08-29 12:30:44.586 +05:30 [INF] Executed endpoint '/MasterData'
+2025-08-29 12:30:44.586 +05:30 [INF] HTTP GET /MasterData responded 200 in 35.4635 ms
+2025-08-29 12:30:44.587 +05:30 [INF] Request finished HTTP/2 GET https://localhost:5001/MasterData - 200 null text/html; charset=utf-8 35.9247ms
+2025-08-29 12:30:45.992 +05:30 [INF] Request starting HTTP/2 GET https://localhost:5001/RateEngine - null null
+2025-08-29 12:30:45.993 +05:30 [INF] Executing endpoint '/RateEngine'
+2025-08-29 12:30:45.998 +05:30 [INF] Route matched with {page = "/RateEngine", action = "", controller = ""}. Executing page /RateEngine
+2025-08-29 12:30:45.998 +05:30 [INF] Executing handler method RateEngineModel.OnGetAsync - ModelState is "Valid"
+2025-08-29 12:30:46.025 +05:30 [INF] Executed handler method OnGetAsync, returned result .
+2025-08-29 12:30:46.025 +05:30 [INF] Executing an implicit handler method - ModelState is "Valid"
+2025-08-29 12:30:46.025 +05:30 [INF] Executed an implicit handler method, returned result Microsoft.AspNetCore.Mvc.RazorPages.PageResult.
+2025-08-29 12:30:46.032 +05:30 [INF] Executed page /RateEngine in 33.3654ms
+2025-08-29 12:30:46.032 +05:30 [INF] Executed endpoint '/RateEngine'
+2025-08-29 12:30:46.032 +05:30 [INF] HTTP GET /RateEngine responded 200 in 38.9041 ms
+2025-08-29 12:30:46.032 +05:30 [INF] Request finished HTTP/2 GET https://localhost:5001/RateEngine - 200 null text/html; charset=utf-8 39.5526ms
+2025-08-29 12:30:46.058 +05:30 [INF] Request starting HTTP/2 POST https://localhost:5001/RateEngine?handler=CalculateRate - application/json 33
+2025-08-29 12:30:46.059 +05:30 [INF] Executing endpoint '/RateEngine'
+2025-08-29 12:30:46.059 +05:30 [INF] Route matched with {page = "/RateEngine", action = "", controller = ""}. Executing page /RateEngine
+2025-08-29 12:30:46.061 +05:30 [INF] Antiforgery token validation failed. The required antiforgery header value "RequestVerificationToken" is not present.
+Microsoft.AspNetCore.Antiforgery.AntiforgeryValidationException: The required antiforgery header value "RequestVerificationToken" is not present.
+   at Microsoft.AspNetCore.Antiforgery.DefaultAntiforgery.ValidateRequestAsync(HttpContext httpContext)
+   at Microsoft.AspNetCore.Mvc.ViewFeatures.Filters.ValidateAntiforgeryTokenAuthorizationFilter.OnAuthorizationAsync(AuthorizationFilterContext context)
+2025-08-29 12:30:46.098 +05:30 [INF] Authorization failed for the request at filter 'Microsoft.AspNetCore.Mvc.ViewFeatures.Filters.AutoValidateAntiforgeryTokenAuthorizationFilter'.
+2025-08-29 12:30:46.102 +05:30 [INF] Executing StatusCodeResult, setting HTTP status code 400
+2025-08-29 12:30:46.102 +05:30 [INF] Executed page /RateEngine in 43.0758ms
+2025-08-29 12:30:46.102 +05:30 [INF] Executed endpoint '/RateEngine'
+2025-08-29 12:30:46.102 +05:30 [INF] HTTP POST /RateEngine responded 400 in 43.5810 ms
+2025-08-29 12:30:46.102 +05:30 [INF] Request finished HTTP/2 POST https://localhost:5001/RateEngine?handler=CalculateRate - 400 0 null 44.1197ms
+2025-08-29 12:30:46.577 +05:30 [INF] Request starting HTTP/2 GET https://localhost:5001/KYCVerification - null null
+2025-08-29 12:30:46.578 +05:30 [INF] Executing endpoint '/KYCVerification'
+2025-08-29 12:30:46.584 +05:30 [INF] Route matched with {page = "/KYCVerification", action = "", controller = ""}. Executing page /KYCVerification
+2025-08-29 12:30:46.589 +05:30 [INF] Executing handler method KYCVerificationModel.OnGetAsync - ModelState is "Valid"
+2025-08-29 12:30:46.593 +05:30 [INF] Executed handler method OnGetAsync, returned result .
+2025-08-29 12:30:46.593 +05:30 [INF] Executing an implicit handler method - ModelState is "Valid"
+2025-08-29 12:30:46.593 +05:30 [INF] Executed an implicit handler method, returned result Microsoft.AspNetCore.Mvc.RazorPages.PageResult.
+2025-08-29 12:30:46.598 +05:30 [INF] Executed page /KYCVerification in 14.1578ms
+2025-08-29 12:30:46.599 +05:30 [INF] Executed endpoint '/KYCVerification'
+2025-08-29 12:30:46.599 +05:30 [INF] HTTP GET /KYCVerification responded 200 in 21.2406 ms
+2025-08-29 12:30:46.599 +05:30 [INF] Request finished HTTP/2 GET https://localhost:5001/KYCVerification - 200 null text/html; charset=utf-8 21.9118ms
+2025-08-29 12:30:48.509 +05:30 [INF] Request starting HTTP/2 GET https://localhost:5001/Reports - null null
+2025-08-29 12:30:48.510 +05:30 [INF] Executing endpoint '/Reports'
+2025-08-29 12:30:48.515 +05:30 [INF] Route matched with {page = "/Reports", action = "", controller = ""}. Executing page /Reports
+2025-08-29 12:30:48.516 +05:30 [INF] Executing handler method ReportsModel.OnGetAsync - ModelState is "Valid"
+2025-08-29 12:30:48.518 +05:30 [INF] Executed handler method OnGetAsync, returned result Microsoft.AspNetCore.Mvc.RazorPages.PageResult.
+2025-08-29 12:30:48.522 +05:30 [INF] Executed page /Reports in 6.8324ms
+2025-08-29 12:30:48.522 +05:30 [INF] Executed endpoint '/Reports'
+2025-08-29 12:30:48.522 +05:30 [INF] HTTP GET /Reports responded 200 in 12.7065 ms
+2025-08-29 12:30:48.522 +05:30 [INF] Request finished HTTP/2 GET https://localhost:5001/Reports - 200 null text/html; charset=utf-8 13.2546ms
+2025-08-29 12:34:40.999 +05:30 [INF] User profile is available. Using 'C:\Users\admin\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2025-08-29 12:34:41.096 +05:30 [INF] Starting Dairy Management System on 
+2025-08-29 12:34:41.161 +05:30 [WRN] The ASP.NET Core developer certificate is not trusted. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert.
+2025-08-29 12:34:41.176 +05:30 [INF] Now listening on: https://localhost:5001
+2025-08-29 12:34:41.176 +05:30 [INF] Now listening on: http://localhost:5002
+2025-08-29 12:34:41.176 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2025-08-29 12:34:41.176 +05:30 [INF] Hosting environment: Development
+2025-08-29 12:34:41.176 +05:30 [INF] Content root path: E:\Sachin\Projects\Dairy Milk Collection & Sales Management System\src\Web
