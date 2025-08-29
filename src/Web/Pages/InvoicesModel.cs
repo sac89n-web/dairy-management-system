@@ -24,27 +24,92 @@ public class InvoicesModel : BasePageModel
     {
         using var connection = GetConnection();
         
-        Invoices = (await connection.QueryAsync<Invoice>(@"
-            SELECT i.*, c.name as customer_name
-            FROM dairy.invoices i
-            LEFT JOIN dairy.customer c ON i.customer_id = c.id
-            ORDER BY i.invoice_date DESC")).ToList();
+        try
+        {
+            // Check if tables exist, if not create them
+            await EnsureTablesExist(connection);
+            
+            Invoices = (await connection.QueryAsync<Invoice>(@"
+                SELECT i.*, c.name as customer_name
+                FROM dairy.invoices i
+                LEFT JOIN dairy.customer c ON i.customer_id = c.id
+                ORDER BY i.invoice_date DESC")).ToList();
 
-        Customers = (await connection.QueryAsync<Customer>("SELECT id, name, contact, email, city, customer_type FROM dairy.customer WHERE is_active = true ORDER BY name")).ToList();
-        Products = (await connection.QueryAsync<Product>("SELECT id, name, price FROM dairy.products WHERE is_active = true ORDER BY name")).ToList();
+            Customers = (await connection.QueryAsync<Customer>("SELECT id, name, contact, email, city, customer_type FROM dairy.customer WHERE is_active = true ORDER BY name")).ToList();
+            Products = (await connection.QueryAsync<Product>("SELECT id, name, price FROM dairy.products WHERE is_active = true ORDER BY name")).ToList();
 
-        var today = DateTime.Today;
-        TodayInvoices = await connection.QuerySingleOrDefaultAsync<int>(
-            "SELECT COUNT(*) FROM dairy.invoices WHERE DATE(invoice_date) = @today", new { today });
+            var today = DateTime.Today;
+            TodayInvoices = await connection.QuerySingleOrDefaultAsync<int>(
+                "SELECT COUNT(*) FROM dairy.invoices WHERE DATE(invoice_date) = @today", new { today });
 
-        PaidInvoices = await connection.QuerySingleOrDefaultAsync<int>(
-            "SELECT COUNT(*) FROM dairy.invoices WHERE status = 'Paid'");
+            PaidInvoices = await connection.QuerySingleOrDefaultAsync<int>(
+                "SELECT COUNT(*) FROM dairy.invoices WHERE status = 'Paid'");
 
-        PendingAmount = await connection.QuerySingleOrDefaultAsync<decimal>(
-            "SELECT COALESCE(SUM(total_amount), 0) FROM dairy.invoices WHERE status = 'Pending'");
+            PendingAmount = await connection.QuerySingleOrDefaultAsync<decimal>(
+                "SELECT COALESCE(SUM(total_amount), 0) FROM dairy.invoices WHERE status = 'Pending'");
 
-        TotalRevenue = await connection.QuerySingleOrDefaultAsync<decimal>(
-            "SELECT COALESCE(SUM(total_amount), 0) FROM dairy.invoices WHERE status = 'Paid'");
+            TotalRevenue = await connection.QuerySingleOrDefaultAsync<decimal>(
+                "SELECT COALESCE(SUM(total_amount), 0) FROM dairy.invoices WHERE status = 'Paid'");
+        }
+        catch (Exception ex)
+        {
+            // If tables don't exist, initialize empty data
+            Console.WriteLine($"Invoice tables not found: {ex.Message}");
+            Invoices = new List<Invoice>();
+            Customers = new List<Customer>();
+            Products = new List<Product>();
+        }
+    }
+
+    private async Task EnsureTablesExist(Npgsql.NpgsqlConnection connection)
+    {
+        // Create tables if they don't exist
+        await connection.ExecuteAsync(@"
+            CREATE TABLE IF NOT EXISTS dairy.invoices (
+                id SERIAL PRIMARY KEY,
+                invoice_number VARCHAR(50) UNIQUE NOT NULL,
+                customer_id INTEGER NOT NULL,
+                invoice_date DATE NOT NULL,
+                subtotal DECIMAL(10,2) NOT NULL,
+                tax_amount DECIMAL(10,2) NOT NULL,
+                total_amount DECIMAL(10,2) NOT NULL,
+                payment_method VARCHAR(20) NOT NULL,
+                status VARCHAR(20) NOT NULL,
+                paid_date DATE,
+                created_at TIMESTAMP DEFAULT NOW()
+            )");
+        
+        await connection.ExecuteAsync(@"
+            CREATE TABLE IF NOT EXISTS dairy.invoice_items (
+                id SERIAL PRIMARY KEY,
+                invoice_id INTEGER NOT NULL,
+                product_id INTEGER NOT NULL,
+                quantity DECIMAL(10,2) NOT NULL,
+                unit_price DECIMAL(10,2) NOT NULL,
+                total_price DECIMAL(10,2) NOT NULL
+            )");
+        
+        await connection.ExecuteAsync(@"
+            CREATE TABLE IF NOT EXISTS dairy.products (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(100) NOT NULL,
+                price DECIMAL(10,2) NOT NULL,
+                is_active BOOLEAN DEFAULT true
+            )");
+        
+        // Insert default products if empty
+        var productCount = await connection.QuerySingleOrDefaultAsync<int>("SELECT COUNT(*) FROM dairy.products");
+        if (productCount == 0)
+        {
+            await connection.ExecuteAsync(@"
+                INSERT INTO dairy.products (name, price) VALUES
+                ('Full Cream Milk (1L)', 60.00),
+                ('Toned Milk (1L)', 55.00),
+                ('Skimmed Milk (1L)', 50.00),
+                ('Butter (500g)', 250.00),
+                ('Paneer (250g)', 120.00),
+                ('Curd (500g)', 40.00)");
+        }
     }
 
     public async Task<IActionResult> OnPostGenerateInvoiceAsync(int customerId, int[] productIds, int[] quantities, decimal[] unitPrices, string paymentMethod)
@@ -53,6 +118,8 @@ public class InvoicesModel : BasePageModel
         
         try
         {
+            await EnsureTablesExist(connection);
+            
             var invoiceNumber = $"INV{DateTime.Now:yyyyMMddHHmmss}";
             var subtotal = 0m;
             
@@ -63,54 +130,6 @@ public class InvoicesModel : BasePageModel
             
             var taxAmount = subtotal * 0.18m; // 18% GST
             var totalAmount = subtotal + taxAmount;
-            
-            // Create tables if they don't exist
-            await connection.ExecuteAsync(@"
-                CREATE TABLE IF NOT EXISTS dairy.invoices (
-                    id SERIAL PRIMARY KEY,
-                    invoice_number VARCHAR(50) UNIQUE NOT NULL,
-                    customer_id INTEGER NOT NULL,
-                    invoice_date DATE NOT NULL,
-                    subtotal DECIMAL(10,2) NOT NULL,
-                    tax_amount DECIMAL(10,2) NOT NULL,
-                    total_amount DECIMAL(10,2) NOT NULL,
-                    payment_method VARCHAR(20) NOT NULL,
-                    status VARCHAR(20) NOT NULL,
-                    paid_date DATE,
-                    created_at TIMESTAMP DEFAULT NOW()
-                )");
-            
-            await connection.ExecuteAsync(@"
-                CREATE TABLE IF NOT EXISTS dairy.invoice_items (
-                    id SERIAL PRIMARY KEY,
-                    invoice_id INTEGER NOT NULL,
-                    product_id INTEGER NOT NULL,
-                    quantity DECIMAL(10,2) NOT NULL,
-                    unit_price DECIMAL(10,2) NOT NULL,
-                    total_price DECIMAL(10,2) NOT NULL
-                )");
-            
-            await connection.ExecuteAsync(@"
-                CREATE TABLE IF NOT EXISTS dairy.products (
-                    id SERIAL PRIMARY KEY,
-                    name VARCHAR(100) NOT NULL,
-                    price DECIMAL(10,2) NOT NULL,
-                    is_active BOOLEAN DEFAULT true
-                )");
-            
-            // Insert default products if empty
-            var productCount = await connection.QuerySingleOrDefaultAsync<int>("SELECT COUNT(*) FROM dairy.products");
-            if (productCount == 0)
-            {
-                await connection.ExecuteAsync(@"
-                    INSERT INTO dairy.products (name, price) VALUES
-                    ('Full Cream Milk (1L)', 60.00),
-                    ('Toned Milk (1L)', 55.00),
-                    ('Skimmed Milk (1L)', 50.00),
-                    ('Butter (500g)', 250.00),
-                    ('Paneer (250g)', 120.00),
-                    ('Curd (500g)', 40.00)");
-            }
             
             var invoiceId = await connection.QuerySingleAsync<int>(@"
                 INSERT INTO dairy.invoices (invoice_number, customer_id, invoice_date, subtotal, tax_amount, total_amount, payment_method, status)
