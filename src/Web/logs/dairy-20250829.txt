@@ -1741,3 +1741,11 @@ Microsoft.AspNetCore.Antiforgery.AntiforgeryValidationException: The required an
 2025-08-29 15:51:25.827 +05:30 [INF] HTTP POST /RateEngine responded 400 in 2.4706 ms
 2025-08-29 15:51:25.827 +05:30 [INF] Request finished HTTP/2 POST https://localhost:5001/RateEngine?handler=CalculateRate - 400 0 null 2.8626ms
 2025-08-29 15:51:25.831 +05:30 [INF] Connection id "0HNF6SMU754AT", Request id "0HNF6SMU754AT:00000025": the application completed without reading the entire request body.
+2025-08-29 15:58:22.700 +05:30 [INF] User profile is available. Using 'C:\Users\admin\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2025-08-29 15:58:22.798 +05:30 [INF] Starting Dairy Management System on 
+2025-08-29 15:58:22.867 +05:30 [WRN] The ASP.NET Core developer certificate is not trusted. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert.
+2025-08-29 15:58:22.885 +05:30 [INF] Now listening on: https://localhost:5001
+2025-08-29 15:58:22.886 +05:30 [INF] Now listening on: http://localhost:5002
+2025-08-29 15:58:22.886 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2025-08-29 15:58:22.886 +05:30 [INF] Hosting environment: Development
+2025-08-29 15:58:22.886 +05:30 [INF] Content root path: e:\Sachin\Projects\Dairy Milk Collection & Sales Management System\src\Web

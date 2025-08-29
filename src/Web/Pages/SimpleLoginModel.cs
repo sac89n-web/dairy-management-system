@@ -17,7 +17,12 @@ public class SimpleLoginModel : PageModel
 
     public async Task OnGetAsync()
     {
-        await _authService.EnsureDefaultUsersAsync();
+        // Check if database connection exists
+        var connectionString = HttpContext.Session.GetString("ConnectionString");
+        if (!string.IsNullOrEmpty(connectionString))
+        {
+            await _authService.EnsureDefaultUsersAsync();
+        }
         
         if (HttpContext.Session.GetString("UserId") != null)
         {
@@ -35,12 +40,19 @@ public class SimpleLoginModel : PageModel
             
             if (result.Success && result.User != null)
             {
+                // Check if database connection exists
+                var connectionString = HttpContext.Session.GetString("ConnectionString");
+                if (string.IsNullOrEmpty(connectionString))
+                {
+                    ErrorMessage = "Please connect to database first via Database Login.";
+                    return Page();
+                }
+                
                 HttpContext.Session.SetString("UserId", result.User.Id.ToString());
                 HttpContext.Session.SetString("UserName", result.User.FullName);
                 HttpContext.Session.SetString("UserRole", result.User.Role.ToString());
                 HttpContext.Session.SetString("UserMobile", result.User.Mobile);
                 HttpContext.Session.SetString("DatabaseConnected", "true");
-                HttpContext.Session.SetString("ConnectionString", "Host=localhost;Database=postgres;Username=admin;Password=admin123;SearchPath=dairy");
 
                 return RedirectToPage("/Dashboard");
             }
