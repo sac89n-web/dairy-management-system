@@ -6,10 +6,12 @@ using Dapper;
 public class MilkCollectionsModel : BasePageModel
 {
     private readonly SqlConnectionFactory _connectionFactory;
+    private readonly IRateEngineService _rateEngine;
 
-    public MilkCollectionsModel(SqlConnectionFactory connectionFactory)
+    public MilkCollectionsModel(SqlConnectionFactory connectionFactory, IRateEngineService rateEngine)
     {
         _connectionFactory = connectionFactory;
+        _rateEngine = rateEngine;
     }
 
     public List<MilkCollection> Collections { get; set; } = new();
@@ -21,8 +23,12 @@ public class MilkCollectionsModel : BasePageModel
     public async Task OnGetAsync()
     {
         using var connection = GetConnection();
+        
+        // Ensure rate engine is initialized
+        await _rateEngine.EnsureDefaultSlabsAsync();
+        
         Collections = (await connection.QueryAsync<MilkCollection>(
-            "SELECT mc.id, f.name as farmer_name, s.name as shift_name, mc.qty_ltr as quantity, mc.fat_pct as fat_percentage, mc.price_per_ltr as rate_per_liter, mc.due_amt as total_amount, mc.date as collection_date, mc.notes, CASE WHEN pf.id IS NOT NULL THEN 'Paid' ELSE 'Pending' END as payment_status FROM dairy.milk_collection mc JOIN dairy.farmer f ON mc.farmer_id = f.id JOIN dairy.shift s ON mc.shift_id = s.id LEFT JOIN dairy.payment_farmer pf ON mc.id = pf.milk_collection_id ORDER BY mc.date DESC, s.id")).ToList();
+            "SELECT mc.id, f.name as farmer_name, s.name as shift_name, mc.qty_ltr as quantity, mc.fat_pct as fat_percentage, mc.snf_pct as snf_percentage, mc.price_per_ltr as rate_per_liter, mc.due_amt as total_amount, mc.date as collection_date, mc.notes, CASE WHEN pf.id IS NOT NULL THEN 'Paid' ELSE 'Pending' END as payment_status FROM dairy.milk_collection mc JOIN dairy.farmer f ON mc.farmer_id = f.id JOIN dairy.shift s ON mc.shift_id = s.id LEFT JOIN dairy.payment_farmer pf ON mc.id = pf.milk_collection_id ORDER BY mc.date DESC, s.id")).ToList();
         
         Farmers = (await connection.QueryAsync<Farmer>("SELECT f.id, f.name, f.code, f.contact, f.bank_id, f.branch_id FROM dairy.farmer f ORDER BY f.name")).ToList();
         Shifts = (await connection.QueryAsync<Shift>("SELECT id, name, start_time, end_time FROM dairy.shift ORDER BY id")).ToList();
@@ -37,13 +43,26 @@ public class MilkCollectionsModel : BasePageModel
             new { today }) ?? new ShiftSummary();
     }
 
-    public async Task<IActionResult> OnPostAddAsync(int farmerId, int shiftId, decimal quantity, decimal fatPercentage, decimal ratePerLiter)
+    public async Task<IActionResult> OnPostAddAsync(int farmerId, int shiftId, decimal quantity, decimal fatPercentage, decimal snfPercentage = 8.5m)
     {
         using var connection = GetConnection();
-        await connection.ExecuteAsync(
-            "INSERT INTO dairy.milk_collection (farmer_id, shift_id, date, qty_ltr, fat_pct, price_per_ltr, due_amt, created_by) VALUES (@farmerId, @shiftId, @date, @quantity, @fatPercentage, @ratePerLiter, @totalAmount, 1)",
-            new { farmerId, shiftId, quantity, fatPercentage, ratePerLiter, totalAmount = quantity * ratePerLiter, date = DateTime.Now.Date });
         
+        // Calculate rate using rate engine
+        var rateResult = await _rateEngine.CalculateRateAsync(fatPercentage, snfPercentage, quantity);
+        
+        if (!rateResult.IsValid)
+        {
+            TempData["ErrorMessage"] = rateResult.ErrorMessage;
+            return RedirectToPage();
+        }
+        
+        var totalAmount = quantity * rateResult.Rate;
+        
+        await connection.ExecuteAsync(
+            "INSERT INTO dairy.milk_collection (farmer_id, shift_id, date, qty_ltr, fat_pct, snf_pct, price_per_ltr, due_amt, created_by) VALUES (@farmerId, @shiftId, @date, @quantity, @fatPercentage, @snfPercentage, @ratePerLiter, @totalAmount, 1)",
+            new { farmerId, shiftId, quantity, fatPercentage, snfPercentage, ratePerLiter = rateResult.Rate, totalAmount, date = DateTime.Now.Date });
+        
+        TempData["SuccessMessage"] = $"Collection added. Rate: ₹{rateResult.Rate:F2}/L ({rateResult.SlabInfo})";
         return RedirectToPage();
     }
 
@@ -106,6 +125,7 @@ public class MilkCollection
     public string shift_name { get; set; } = "";
     public decimal quantity { get; set; }
     public decimal fat_percentage { get; set; }
+    public decimal snf_percentage { get; set; } = 8.5m;
     public decimal rate_per_liter { get; set; }
     public decimal total_amount { get; set; }
     public DateTime collection_date { get; set; }

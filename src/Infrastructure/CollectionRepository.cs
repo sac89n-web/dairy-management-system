@@ -34,14 +34,17 @@ namespace Dairy.Infrastructure
 
         public async Task<int> AddAsync(MilkCollection entity)
         {
-            var sql = @"INSERT INTO dairy.milk_collection (farmer_id, shift_id, date, qty_ltr, fat_pct, price_per_ltr, due_amt, notes, created_by) VALUES (@FarmerId, @ShiftId, @Date::date, @QtyLtr, @FatPct, @PricePerLtr, @DueAmt, @Notes, @CreatedBy) RETURNING id";
+            // Ensure SNF column exists
             using var conn = _connectionFactory.CreateConnection();
+            await conn.ExecuteAsync(@"ALTER TABLE dairy.milk_collection ADD COLUMN IF NOT EXISTS snf_pct DECIMAL(4,2) DEFAULT 8.5");
+            
+            var sql = @"INSERT INTO dairy.milk_collection (farmer_id, shift_id, date, qty_ltr, fat_pct, snf_pct, price_per_ltr, due_amt, notes, created_by) VALUES (@FarmerId, @ShiftId, @Date::date, @QtyLtr, @FatPct, @SnfPct, @PricePerLtr, @DueAmt, @Notes, @CreatedBy) RETURNING id";
             return await conn.ExecuteScalarAsync<int>(sql, entity);
         }
 
         public async Task<int> UpdateAsync(MilkCollection entity)
         {
-            var sql = @"UPDATE dairy.milk_collection SET qty_ltr=@QtyLtr, fat_pct=@FatPct, price_per_ltr=@PricePerLtr, due_amt=@DueAmt, notes=@Notes WHERE id=@Id";
+            var sql = @"UPDATE dairy.milk_collection SET qty_ltr=@QtyLtr, fat_pct=@FatPct, snf_pct=@SnfPct, price_per_ltr=@PricePerLtr, due_amt=@DueAmt, notes=@Notes WHERE id=@Id";
             return await ExecuteAsync(sql, entity);
         }
 

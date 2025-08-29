@@ -119,6 +119,7 @@ builder.Services.AddScoped<AuditLogRepository>();
 // Application Services
 builder.Services.AddScoped<SettingsCache>();
 builder.Services.AddScoped<WeighingMachineService>();
+builder.Services.AddScoped<IRateEngineService, RateEngineService>();
 
 // HTTP Client and DigiLocker Service
 builder.Services.AddHttpClient();
@@ -201,6 +202,10 @@ app.MapDelete("/api/milk-collections/{id}", MilkCollectionEndpoints.Delete);
 
 app.MapGet("/api/sales", SaleEndpoints.List);
 app.MapPost("/api/sales", SaleEndpoints.Add);
+
+// Rate calculation endpoints
+app.MapGet("/api/rate/calculate", RateEndpoints.CalculateRate);
+app.MapGet("/api/rate/slabs", RateEndpoints.GetActiveSlabs);
 
 // Database test endpoint
 app.MapGet("/api/test-db", async (SqlConnectionFactory dbFactory) => {

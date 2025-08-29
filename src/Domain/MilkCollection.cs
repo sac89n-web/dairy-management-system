@@ -8,6 +8,7 @@ namespace Dairy.Domain
         public DateTime Date { get; set; }
         public decimal QtyLtr { get; set; }
         public decimal FatPct { get; set; }
+        public decimal SnfPct { get; set; } = 8.5m;
         public decimal PricePerLtr { get; set; }
         public decimal DueAmt { get; set; }
         public string? Notes { get; set; }
