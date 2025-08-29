@@ -418,3 +418,36 @@ Microsoft.AspNetCore.Antiforgery.AntiforgeryValidationException: The required an
 2025-08-29 13:45:58.888 +05:30 [INF] Executed endpoint '/WeighingMachine'
 2025-08-29 13:45:58.888 +05:30 [INF] HTTP GET /WeighingMachine responded 200 in 49.7349 ms
 2025-08-29 13:45:58.888 +05:30 [INF] Request finished HTTP/2 GET https://localhost:5001/WeighingMachine - 200 null text/html; charset=utf-8 51.612ms
+2025-08-29 13:46:00.227 +05:30 [INF] Request starting HTTP/2 GET https://localhost:5001/MasterData - null null
+2025-08-29 13:46:00.228 +05:30 [INF] Executing endpoint '/MasterData'
+2025-08-29 13:46:00.229 +05:30 [INF] Route matched with {page = "/MasterData", action = "", controller = ""}. Executing page /MasterData
+2025-08-29 13:46:00.229 +05:30 [INF] Executing handler method MasterDataModel.OnGetAsync - ModelState is "Valid"
+2025-08-29 13:46:00.231 +05:30 [INF] Executed handler method OnGetAsync, returned result .
+2025-08-29 13:46:00.231 +05:30 [INF] Executing an implicit handler method - ModelState is "Valid"
+2025-08-29 13:46:00.231 +05:30 [INF] Executed an implicit handler method, returned result Microsoft.AspNetCore.Mvc.RazorPages.PageResult.
+2025-08-29 13:46:00.234 +05:30 [INF] Executed page /MasterData in 5.7139ms
+2025-08-29 13:46:00.234 +05:30 [INF] Executed endpoint '/MasterData'
+2025-08-29 13:46:00.234 +05:30 [INF] HTTP GET /MasterData responded 200 in 6.8353 ms
+2025-08-29 13:46:00.235 +05:30 [INF] Request finished HTTP/2 GET https://localhost:5001/MasterData - 200 null text/html; charset=utf-8 7.5109ms
+2025-08-29 13:46:01.296 +05:30 [INF] Request starting HTTP/2 GET https://localhost:5001/Invoices - null null
+2025-08-29 13:46:01.296 +05:30 [INF] Executing endpoint '/Invoices'
+2025-08-29 13:46:01.296 +05:30 [INF] Route matched with {page = "/Invoices", action = "", controller = ""}. Executing page /Invoices
+2025-08-29 13:46:01.296 +05:30 [INF] Executing handler method InvoicesModel.OnGetAsync - ModelState is "Valid"
+2025-08-29 13:46:01.301 +05:30 [INF] Executed handler method OnGetAsync, returned result .
+2025-08-29 13:46:01.301 +05:30 [INF] Executing an implicit handler method - ModelState is "Valid"
+2025-08-29 13:46:01.301 +05:30 [INF] Executed an implicit handler method, returned result Microsoft.AspNetCore.Mvc.RazorPages.PageResult.
+2025-08-29 13:46:01.304 +05:30 [INF] Executed page /Invoices in 7.4182ms
+2025-08-29 13:46:01.304 +05:30 [INF] Executed endpoint '/Invoices'
+2025-08-29 13:46:01.304 +05:30 [INF] HTTP GET /Invoices responded 200 in 8.0651 ms
+2025-08-29 13:46:01.304 +05:30 [INF] Request finished HTTP/2 GET https://localhost:5001/Invoices - 200 null text/html; charset=utf-8 8.3946ms
+2025-08-29 13:46:01.875 +05:30 [INF] Request starting HTTP/2 GET https://localhost:5001/ColdChain - null null
+2025-08-29 13:46:01.875 +05:30 [INF] Executing endpoint '/ColdChain'
+2025-08-29 13:46:01.875 +05:30 [INF] Route matched with {page = "/ColdChain", action = "", controller = ""}. Executing page /ColdChain
+2025-08-29 13:46:01.875 +05:30 [INF] Executing handler method ColdChainModel.OnGetAsync - ModelState is "Valid"
+2025-08-29 13:46:01.875 +05:30 [INF] Executed handler method OnGetAsync, returned result .
+2025-08-29 13:46:01.875 +05:30 [INF] Executing an implicit handler method - ModelState is "Valid"
+2025-08-29 13:46:01.875 +05:30 [INF] Executed an implicit handler method, returned result Microsoft.AspNetCore.Mvc.RazorPages.PageResult.
+2025-08-29 13:46:01.877 +05:30 [INF] Executed page /ColdChain in 2.0289ms
+2025-08-29 13:46:01.877 +05:30 [INF] Executed endpoint '/ColdChain'
+2025-08-29 13:46:01.877 +05:30 [INF] HTTP GET /ColdChain responded 200 in 2.4297 ms
+2025-08-29 13:46:01.877 +05:30 [INF] Request finished HTTP/2 GET https://localhost:5001/ColdChain - 200 null text/html; charset=utf-8 2.7313ms

@@ -228,6 +228,31 @@ app.MapGet("/db-test", async (SqlConnectionFactory dbFactory) => {
     }
 });
 
+// List all tables endpoint
+app.MapGet("/list-tables", async (SqlConnectionFactory dbFactory) => {
+    try {
+        using var connection = (NpgsqlConnection)dbFactory.CreateConnection();
+        await connection.OpenAsync();
+        
+        using var cmd = new NpgsqlCommand("SELECT table_name FROM information_schema.tables WHERE table_schema = 'dairy' ORDER BY table_name", connection);
+        using var reader = await cmd.ExecuteReaderAsync();
+        
+        var tables = new List<string>();
+        while (await reader.ReadAsync())
+        {
+            tables.Add(reader.GetString(0));
+        }
+        
+        return Results.Json(new { 
+            success = true, 
+            count = tables.Count,
+            tables = tables
+        });
+    } catch (Exception ex) {
+        return Results.Json(new { success = false, error = ex.Message });
+    }
+});
+
 // Database setup endpoint
 app.MapGet("/setup-db", async (SqlConnectionFactory dbFactory) => {
     try {
