@@ -1,17 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Npgsql;
-using Dairy.Web.Services;
 
 public class DatabaseLoginModel : PageModel
 {
-    private readonly DatabaseSettingsService _settingsService;
-    private readonly PythonDbService _pythonDbService;
-
-    public DatabaseLoginModel(DatabaseSettingsService settingsService, PythonDbService pythonDbService)
+    public DatabaseLoginModel()
     {
-        _settingsService = settingsService;
-        _pythonDbService = pythonDbService;
     }
 
     public string Host { get; set; } = "localhost";
@@ -20,33 +14,8 @@ public class DatabaseLoginModel : PageModel
     public bool RememberCredentials { get; set; } = true;
     public string ErrorMessage { get; set; } = "";
 
-    public async Task OnGetAsync()
+    public void OnGet()
     {
-        // Try auto-reconnect with saved settings
-        var savedSettings = await _settingsService.LoadSettingsAsync();
-        if (savedSettings != null && savedSettings.RememberCredentials)
-        {
-            try
-            {
-                var connectionString = _settingsService.BuildConnectionString(savedSettings);
-                using var connection = new NpgsqlConnection(connectionString);
-                await connection.OpenAsync();
-                
-                HttpContext.Session.SetString("DatabaseConnected", "true");
-                HttpContext.Session.SetString("ConnectionString", connectionString);
-                Response.Redirect("/Dashboard");
-                return;
-            }
-            catch
-            {
-                // Auto-reconnect failed, show form with saved values
-                Host = savedSettings.Host;
-                Database = savedSettings.Database;
-                Username = savedSettings.Username;
-                RememberCredentials = savedSettings.RememberCredentials;
-            }
-        }
-        
         // Check if already connected
         if (HttpContext.Session.GetString("DatabaseConnected") == "true")
         {
@@ -58,44 +27,17 @@ public class DatabaseLoginModel : PageModel
     {
         try
         {
-            var settings = new DatabaseSettings
-            {
-                Host = host,
-                Database = database,
-                Username = username,
-                Password = password,
-                RememberCredentials = rememberCredentials
-            };
+            var connectionString = $"Host={host};Database={database};Username={username};Password={password};SearchPath=dairy";
             
-            var connectionString = _settingsService.BuildConnectionString(settings);
-            
-            // Test connection using Python script first
-            var pythonResult = await _pythonDbService.TestConnectionAsync(host, database, username, password);
-            if (!pythonResult.Success)
-            {
-                Host = host;
-                Database = database;
-                Username = username;
-                RememberCredentials = rememberCredentials;
-                ErrorMessage = $"Python test failed: {pythonResult.Error}";
-                return Page();
-            }
-            
-            // Test connection with .NET
+            // Test connection
             using var connection = new NpgsqlConnection(connectionString);
             await connection.OpenAsync();
-            
-            // Save settings if requested
-            if (rememberCredentials)
-            {
-                await _settingsService.SaveSettingsAsync(settings);
-            }
             
             // Store connection info in session
             HttpContext.Session.SetString("DatabaseConnected", "true");
             HttpContext.Session.SetString("ConnectionString", connectionString);
             
-            return RedirectToPage("/Dashboard");
+            return RedirectToPage("/simple-login");
         }
         catch (Exception ex)
         {
@@ -110,7 +52,17 @@ public class DatabaseLoginModel : PageModel
 
     public async Task<IActionResult> OnPostTestConnectionAsync(string host, string database, string username, string password)
     {
-        var result = await _pythonDbService.TestConnectionAsync(host, database, username, password);
-        return new JsonResult(result);
+        try
+        {
+            var connectionString = $"Host={host};Database={database};Username={username};Password={password};SearchPath=dairy";
+            using var connection = new NpgsqlConnection(connectionString);
+            await connection.OpenAsync();
+            
+            return new JsonResult(new { Success = true, Message = "Connection successful" });
+        }
+        catch (Exception ex)
+        {
+            return new JsonResult(new { Success = false, Error = ex.Message });
+        }
     }
 }
