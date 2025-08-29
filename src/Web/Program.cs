@@ -121,6 +121,7 @@ builder.Services.AddScoped<SettingsCache>();
 builder.Services.AddScoped<WeighingMachineService>();
 builder.Services.AddScoped<IRateEngineService, RateEngineService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // HTTP Client and DigiLocker Service
 builder.Services.AddHttpClient();
@@ -155,19 +156,7 @@ var app = builder.Build();
 app.UseSession();
 
 // Authentication middleware
-app.Use(async (context, next) =>
-{
-    var publicPaths = new[] { "/simple-login", "/login", "/database-login", "/health", "/api/test-db", "/swagger", "/api", "/list-tables", "/db-test", "/setup-db" };
-    
-    if (!publicPaths.Any(p => context.Request.Path.StartsWithSegments(p)) && 
-        context.Session.GetString("UserId") == null)
-    {
-        context.Response.Redirect("/simple-login");
-        return;
-    }
-    
-    await next();
-});
+app.UseMiddleware<Dairy.Web.Middleware.AuthorizationMiddleware>();
 
 // Localization Middleware
 var locOptions = app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value;

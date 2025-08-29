@@ -1,0 +1,173 @@
+@page
+@model UsersModel
+@{
+    ViewData["Title"] = "User Management";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2><i class="fas fa-users text-primary"></i> User Management</h2>
+        <p class="text-muted">Manage system users and permissions</p>
+    </div>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+        <i class="fas fa-plus"></i> Add User
+    </button>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">System Users</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Username</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Last Login</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach(var user in Model.Users)
+                    {
+                        <tr>
+                            <td><strong>@user.Username</strong></td>
+                            <td>@user.FullName</td>
+                            <td>@user.Email</td>
+                            <td>
+                                <span class="badge bg-@(GetRoleBadgeColor(user.Role))">
+                                    @user.Role
+                                </span>
+                            </td>
+                            <td>
+                                @if(user.IsActive)
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Inactive</span>
+                                }
+                            </td>
+                            <td>
+                                @if(user.LastLoginAt.HasValue)
+                                {
+                                    @user.LastLoginAt.Value.ToString("dd/MM/yyyy HH:mm")
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Never</span>
+                                }
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary" onclick="editUser(@user.Id)">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                @if(user.Id != 1)
+                                {
+                                    <button class="btn btn-sm btn-outline-danger" onclick="toggleUser(@user.Id, @user.IsActive.ToString().ToLower())">
+                                        <i class="fas fa-@(user.IsActive ? "ban" : "check")"></i>
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add User Modal -->
+<div class="modal fade" id="addUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="AddUser">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input type="text" class="form-control" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-control" name="fullName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mobile</label>
+                        <input type="tel" class="form-control" name="mobile">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Role</label>
+                        <select class="form-select" name="role" required>
+                            <option value="2">Manager</option>
+                            <option value="3">Operator</option>
+                            <option value="4">Finance</option>
+                            <option value="5">Auditor</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-control" name="password" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@functions {
+    string GetRoleBadgeColor(Dairy.Domain.UserRole role)
+    {
+        return role switch
+        {
+            Dairy.Domain.UserRole.Admin => "danger",
+            Dairy.Domain.UserRole.Manager => "primary",
+            Dairy.Domain.UserRole.Operator => "success",
+            Dairy.Domain.UserRole.Finance => "warning",
+            Dairy.Domain.UserRole.Auditor => "info",
+            _ => "secondary"
+        };
+    }
+}
+
+<script>
+async function toggleUser(userId, isActive) {
+    const action = isActive ? 'deactivate' : 'activate';
+    if (confirm(`Are you sure you want to ${action} this user?`)) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '?handler=ToggleUser';
+        
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'userId';
+        input.value = userId;
+        form.appendChild(input);
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+function editUser(userId) {
+    // TODO: Implement edit user functionality
+    alert('Edit user functionality coming soon');
+}
+</script>

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Dairy.Infrastructure;
 using Dairy.Domain;
+using Dapper;
 
 public class RateSlabsModel : BasePageModel
 {
@@ -12,7 +13,7 @@ public class RateSlabsModel : BasePageModel
         _rateEngine = rateEngine;
     }
 
-    public List<RateSlab> RateSlabs { get; set; } = new();
+    public List<Dairy.Domain.RateSlab> RateSlabs { get; set; } = new();
 
     public async Task OnGetAsync()
     {

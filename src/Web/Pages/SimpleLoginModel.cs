@@ -1,15 +1,24 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Dairy.Infrastructure;
 
 public class SimpleLoginModel : PageModel
 {
+    private readonly IAuthService _authService;
+
+    public SimpleLoginModel(IAuthService authService)
+    {
+        _authService = authService;
+    }
+
     public string Username { get; set; } = "";
     public string ErrorMessage { get; set; } = "";
     public string SuccessMessage { get; set; } = "";
 
-    public void OnGet()
+    public async Task OnGetAsync()
     {
-        // Check if user is already logged in
+        await _authService.EnsureDefaultUsersAsync();
+        
         if (HttpContext.Session.GetString("UserId") != null)
         {
             Response.Redirect("/Dashboard");
@@ -22,14 +31,14 @@ public class SimpleLoginModel : PageModel
 
         try
         {
-            // Simple credential validation
-            if (username == "admin" && password == "admin123")
+            var result = await _authService.LoginAsync(username, password);
+            
+            if (result.Success && result.User != null)
             {
-                // Set session
-                HttpContext.Session.SetString("UserId", "1");
-                HttpContext.Session.SetString("UserName", "Administrator");
-                HttpContext.Session.SetString("UserRole", "Admin");
-                HttpContext.Session.SetString("UserMobile", "8108891477");
+                HttpContext.Session.SetString("UserId", result.User.Id.ToString());
+                HttpContext.Session.SetString("UserName", result.User.FullName);
+                HttpContext.Session.SetString("UserRole", result.User.Role.ToString());
+                HttpContext.Session.SetString("UserMobile", result.User.Mobile);
                 HttpContext.Session.SetString("DatabaseConnected", "true");
                 HttpContext.Session.SetString("ConnectionString", "Host=localhost;Database=postgres;Username=admin;Password=admin123;SearchPath=dairy");
 
@@ -37,7 +46,7 @@ public class SimpleLoginModel : PageModel
             }
             else
             {
-                ErrorMessage = "Invalid username or password. Please try again.";
+                ErrorMessage = result.Message;
                 return Page();
             }
         }

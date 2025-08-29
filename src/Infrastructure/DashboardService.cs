@@ -1,8 +1,7 @@
-using Dairy.Infrastructure;
 using Dapper;
 using Npgsql;
 
-namespace Dairy.Application
+namespace Dairy.Infrastructure
 {
     public interface IDashboardService
     {

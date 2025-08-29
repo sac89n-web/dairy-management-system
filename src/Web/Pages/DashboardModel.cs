@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Dairy.Infrastructure;
+using Dairy.Domain;
 using Dapper;
 using Npgsql;
 
@@ -26,14 +27,13 @@ public class DashboardModel : BasePageModel
     public decimal WeeklyGrowth { get; set; }
     public List<RateAnalytics> RateAnalytics { get; set; } = new();
     public List<QualityTrend> QualityTrends { get; set; } = new();
-    public List<RateSlab> ActiveSlabs { get; set; } = new();
+    public List<Dairy.Domain.RateSlab> ActiveSlabs { get; set; } = new();
     public int LowStockItems { get; set; }
     public int ActiveSubscriptions { get; set; }
     public List<RecentCollection> RecentCollections { get; set; } = new();
     public List<RecentSale> RecentSales { get; set; } = new();
     public List<DashboardTopFarmer> TopFarmers { get; set; } = new();
     public List<MonthlyTrend> MonthlyTrends { get; set; } = new();
-    public decimal WeeklyGrowth { get; set; }
     public decimal MonthlyGrowth { get; set; }
     public int PendingPayments { get; set; }
     public decimal AvgFatContent { get; set; }
