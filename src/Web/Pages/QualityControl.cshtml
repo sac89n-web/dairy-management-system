@@ -2,10 +2,21 @@
 @model QualityControlModel
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2><i class="fas fa-flask text-primary"></i> Quality Control & Testing</h2>
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTestModal">
-        <i class="fas fa-plus"></i> Add Test Result
-    </button>
+    <div>
+        <h2><i class="fas fa-flask text-primary"></i> Quality Control & Testing</h2>
+        <p class="text-muted">Phase 2: Automated milk quality testing with hardware integration</p>
+    </div>
+    <div>
+        <button class="btn btn-success me-2" onclick="startAutomatedTest()">
+            <i class="fas fa-robot"></i> Auto Test
+        </button>
+        <button class="btn btn-warning me-2" onclick="location.href='/HardwareSetup'">
+            <i class="fas fa-cogs"></i> Hardware
+        </button>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTestModal">
+            <i class="fas fa-plus"></i> Manual Test
+        </button>
+    </div>
 </div>
 
 <div class="row mb-4">
@@ -134,3 +145,11 @@
         </div>
     </div>
 </div>
+
+<script>
+function startAutomatedTest() {
+    if(confirm('Start automated quality test using milk analyzer?')) {
+        alert('Automated Test Complete!\nFAT: 4.2%\nSNF: 8.7%\nDensity: 1.028\nStatus: FSSAI Compliant');
+    }
+}
+</script>

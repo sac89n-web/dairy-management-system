@@ -126,6 +126,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 // HTTP Client and DigiLocker Service
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<Dairy.Web.Services.DigiLockerService>();
+builder.Services.AddScoped<Dairy.Web.Services.DatabaseSettingsService>();
 
 // Report Services
 builder.Services.AddScoped<ExcelReportService>();

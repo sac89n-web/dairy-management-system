@@ -1,0 +1,275 @@
+@page
+@model HardwareSetupModel
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2><i class="fas fa-cogs text-primary"></i> Hardware Setup</h2>
+        <p class="text-muted">Phase 2: Configure digital scales, milk analyzers, and thermal printers</p>
+    </div>
+    <button class="btn btn-success" onclick="scanPorts()">
+        <i class="fas fa-search"></i> Scan Ports
+    </button>
+</div>
+
+<div class="row">
+    <!-- Digital Scale -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-weight"></i> Digital Scale</h5>
+                <span class="badge bg-secondary" id="scaleStatus">Disconnected</span>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">COM Port</label>
+                    <select class="form-select" id="scalePort">
+                        <option value="">Select Port</option>
+                        <option value="COM1">COM1</option>
+                        <option value="COM2">COM2</option>
+                        <option value="COM3">COM3</option>
+                        <option value="COM4">COM4</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Baud Rate</label>
+                    <select class="form-select" id="scaleBaud">
+                        <option value="9600">9600</option>
+                        <option value="19200">19200</option>
+                        <option value="38400">38400</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Current Weight</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="currentWeight" readonly>
+                        <span class="input-group-text">kg</span>
+                    </div>
+                </div>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary" onclick="connectScale()">Connect</button>
+                    <button class="btn btn-warning" onclick="tareScale()">Tare</button>
+                    <button class="btn btn-info" onclick="calibrateScale()">Calibrate</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Milk Analyzer -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-flask"></i> Milk Analyzer</h5>
+                <span class="badge bg-secondary" id="analyzerStatus">Disconnected</span>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">COM Port</label>
+                    <select class="form-select" id="analyzerPort">
+                        <option value="">Select Port</option>
+                        <option value="COM5">COM5</option>
+                        <option value="COM6">COM6</option>
+                        <option value="COM7">COM7</option>
+                        <option value="COM8">COM8</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">FAT %</label>
+                    <input type="text" class="form-control" id="fatReading" readonly>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">SNF %</label>
+                    <input type="text" class="form-control" id="snfReading" readonly>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Density</label>
+                    <input type="text" class="form-control" id="densityReading" readonly>
+                </div>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary" onclick="connectAnalyzer()">Connect</button>
+                    <button class="btn btn-success" onclick="analyzeQuality()">Analyze</button>
+                    <button class="btn btn-warning" onclick="cleanAnalyzer()">Clean</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thermal Printer -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-print"></i> Thermal Printer</h5>
+                <span class="badge bg-secondary" id="printerStatus">Disconnected</span>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">COM Port</label>
+                    <select class="form-select" id="printerPort">
+                        <option value="">Select Port</option>
+                        <option value="COM9">COM9</option>
+                        <option value="COM10">COM10</option>
+                        <option value="COM11">COM11</option>
+                        <option value="COM12">COM12</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Paper Width</label>
+                    <select class="form-select" id="paperWidth">
+                        <option value="58">58mm</option>
+                        <option value="80">80mm</option>
+                    </select>
+                </div>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary" onclick="connectPrinter()">Connect</button>
+                    <button class="btn btn-success" onclick="printTestReceipt()">Test Print</button>
+                    <button class="btn btn-warning" onclick="cutPaper()">Cut Paper</button>
+                    <button class="btn btn-info" onclick="openDrawer()">Open Drawer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-terminal"></i> Hardware Log</h5>
+            </div>
+            <div class="card-body">
+                <div id="hardwareLog" style="height: 200px; overflow-y: auto; background: #f8f9fa; padding: 10px; font-family: monospace;">
+                    <div class="text-muted">Hardware operations will be logged here...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function logMessage(message) {
+    const log = document.getElementById('hardwareLog');
+    const timestamp = new Date().toLocaleTimeString();
+    log.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+    log.scrollTop = log.scrollHeight;
+}
+
+function scanPorts() {
+    logMessage('Scanning available COM ports...');
+    // Simulate port scanning
+    setTimeout(() => {
+        logMessage('Found ports: COM1, COM2, COM3, COM4, COM5, COM6');
+    }, 1000);
+}
+
+function connectScale() {
+    const port = document.getElementById('scalePort').value;
+    if (!port) {
+        alert('Please select a COM port');
+        return;
+    }
+    
+    logMessage(`Connecting to digital scale on ${port}...`);
+    document.getElementById('scaleStatus').textContent = 'Connecting...';
+    document.getElementById('scaleStatus').className = 'badge bg-warning';
+    
+    setTimeout(() => {
+        document.getElementById('scaleStatus').textContent = 'Connected';
+        document.getElementById('scaleStatus').className = 'badge bg-success';
+        logMessage('Digital scale connected successfully');
+        
+        // Start weight simulation
+        setInterval(() => {
+            const weight = (Math.random() * 50 + 10).toFixed(2);
+            document.getElementById('currentWeight').value = weight;
+        }, 1000);
+    }, 2000);
+}
+
+function tareScale() {
+    logMessage('Taring scale...');
+    document.getElementById('currentWeight').value = '0.00';
+    logMessage('Scale tared successfully');
+}
+
+function calibrateScale() {
+    const weight = prompt('Enter known calibration weight (kg):');
+    if (weight) {
+        logMessage(`Calibrating scale with ${weight}kg...`);
+        setTimeout(() => {
+            logMessage('Scale calibration completed');
+        }, 3000);
+    }
+}
+
+function connectAnalyzer() {
+    const port = document.getElementById('analyzerPort').value;
+    if (!port) {
+        alert('Please select a COM port');
+        return;
+    }
+    
+    logMessage(`Connecting to milk analyzer on ${port}...`);
+    document.getElementById('analyzerStatus').textContent = 'Connected';
+    document.getElementById('analyzerStatus').className = 'badge bg-success';
+    logMessage('Milk analyzer connected successfully');
+}
+
+function analyzeQuality() {
+    logMessage('Starting milk quality analysis...');
+    document.getElementById('fatReading').value = 'Analyzing...';
+    document.getElementById('snfReading').value = 'Analyzing...';
+    document.getElementById('densityReading').value = 'Analyzing...';
+    
+    setTimeout(() => {
+        const fat = (Math.random() * 2 + 3).toFixed(2);
+        const snf = (Math.random() * 1.5 + 8).toFixed(2);
+        const density = (Math.random() * 0.005 + 1.025).toFixed(3);
+        
+        document.getElementById('fatReading').value = fat + '%';
+        document.getElementById('snfReading').value = snf + '%';
+        document.getElementById('densityReading').value = density;
+        
+        logMessage(`Analysis complete - FAT: ${fat}%, SNF: ${snf}%, Density: ${density}`);
+    }, 3000);
+}
+
+function cleanAnalyzer() {
+    logMessage('Starting analyzer cleaning cycle...');
+    setTimeout(() => {
+        logMessage('Analyzer cleaning completed');
+    }, 5000);
+}
+
+function connectPrinter() {
+    const port = document.getElementById('printerPort').value;
+    if (!port) {
+        alert('Please select a COM port');
+        return;
+    }
+    
+    logMessage(`Connecting to thermal printer on ${port}...`);
+    document.getElementById('printerStatus').textContent = 'Connected';
+    document.getElementById('printerStatus').className = 'badge bg-success';
+    logMessage('Thermal printer connected successfully');
+}
+
+function printTestReceipt() {
+    logMessage('Printing test receipt...');
+    setTimeout(() => {
+        logMessage('Test receipt printed successfully');
+    }, 2000);
+}
+
+function cutPaper() {
+    logMessage('Cutting paper...');
+    setTimeout(() => {
+        logMessage('Paper cut completed');
+    }, 500);
+}
+
+function openDrawer() {
+    logMessage('Opening cash drawer...');
+    setTimeout(() => {
+        logMessage('Cash drawer opened');
+    }, 500);
+}
+</script>
