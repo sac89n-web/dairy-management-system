@@ -407,3 +407,14 @@ Microsoft.AspNetCore.Antiforgery.AntiforgeryValidationException: The required an
 2025-08-29 12:36:51.176 +05:30 [INF] Executed endpoint '/Dashboard'
 2025-08-29 12:36:51.177 +05:30 [INF] HTTP GET /Dashboard responded 200 in 18.5305 ms
 2025-08-29 12:36:51.177 +05:30 [INF] Request finished HTTP/2 GET https://localhost:5001/Dashboard - 200 null text/html; charset=utf-8 19.2174ms
+2025-08-29 13:45:58.836 +05:30 [INF] Request starting HTTP/2 GET https://localhost:5001/WeighingMachine - null null
+2025-08-29 13:45:58.838 +05:30 [INF] Executing endpoint '/WeighingMachine'
+2025-08-29 13:45:58.838 +05:30 [INF] Route matched with {page = "/WeighingMachine", action = "", controller = ""}. Executing page /WeighingMachine
+2025-08-29 13:45:58.839 +05:30 [INF] Executing handler method WeighingMachineModel.OnGetAsync - ModelState is "Valid"
+2025-08-29 13:45:58.886 +05:30 [INF] Executed handler method OnGetAsync, returned result .
+2025-08-29 13:45:58.886 +05:30 [INF] Executing an implicit handler method - ModelState is "Valid"
+2025-08-29 13:45:58.886 +05:30 [INF] Executed an implicit handler method, returned result Microsoft.AspNetCore.Mvc.RazorPages.PageResult.
+2025-08-29 13:45:58.888 +05:30 [INF] Executed page /WeighingMachine in 49.0111ms
+2025-08-29 13:45:58.888 +05:30 [INF] Executed endpoint '/WeighingMachine'
+2025-08-29 13:45:58.888 +05:30 [INF] HTTP GET /WeighingMachine responded 200 in 49.7349 ms
+2025-08-29 13:45:58.888 +05:30 [INF] Request finished HTTP/2 GET https://localhost:5001/WeighingMachine - 200 null text/html; charset=utf-8 51.612ms

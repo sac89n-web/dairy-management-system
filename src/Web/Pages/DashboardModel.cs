@@ -40,11 +40,11 @@ public class DashboardModel : BasePageModel
             new { today });
             
         TodaySales = await connection.QuerySingleOrDefaultAsync<decimal>(
-            "SELECT COALESCE(SUM(qty_ltr), 0) FROM dairy.sales WHERE DATE(date) = @today", 
+            "SELECT COALESCE(SUM(qty_ltr), 0) FROM dairy.sale WHERE DATE(date) = @today", 
             new { today });
             
         TodayRevenue = await connection.QuerySingleOrDefaultAsync<decimal>(
-            "SELECT COALESCE(SUM(paid_amt), 0) FROM dairy.sales WHERE DATE(date) = @today", 
+            "SELECT COALESCE(SUM(paid_amt), 0) FROM dairy.sale WHERE DATE(date) = @today", 
             new { today });
             
         ActiveFarmers = await connection.QuerySingleOrDefaultAsync<int>(
@@ -63,7 +63,7 @@ public class DashboardModel : BasePageModel
 
         // Recent sales
         RecentSales = (await connection.QueryAsync<RecentSale>(
-            "SELECT c.name as customer_name, s.qty_ltr as quantity, s.unit_price as rate_per_liter, s.paid_amt as total_amount FROM dairy.sales s JOIN dairy.customer c ON s.customer_id = c.id ORDER BY s.date DESC LIMIT 5")).ToList();
+            "SELECT c.name as customer_name, s.qty_ltr as quantity, s.unit_price as rate_per_liter, s.paid_amt as total_amount FROM dairy.sale s JOIN dairy.customer c ON s.customer_id = c.id ORDER BY s.date DESC LIMIT 5")).ToList();
 
         // Top farmers by collection
         TopFarmers = (await connection.QueryAsync<DashboardTopFarmer>(@"
