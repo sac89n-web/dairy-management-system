@@ -69,12 +69,20 @@ builder.Services.AddSingleton<SqlConnectionFactory>(sp =>
     var dbUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
     
     string connectionString;
-    if (!string.IsNullOrEmpty(dbUrl) && dbUrl.StartsWith("postgresql://"))
+    if (!string.IsNullOrEmpty(dbUrl))
     {
-        // Parse cloud DATABASE_URL
-        var uri = new Uri(dbUrl);
-        var userInfo = uri.UserInfo.Split(':');
-        connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.Trim('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true;SearchPath=dairy";
+        if (dbUrl.StartsWith("postgresql://"))
+        {
+            // Parse Render DATABASE_URL format
+            var uri = new Uri(dbUrl);
+            var userInfo = uri.UserInfo.Split(':');
+            connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.Trim('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true;SearchPath=dairy";
+        }
+        else
+        {
+            // Direct connection string format
+            connectionString = dbUrl + ";SearchPath=dairy";
+        }
     }
     else
     {
@@ -200,6 +208,25 @@ app.MapGet("/api/test-db", async (SqlConnectionFactory dbFactory) => {
 
 // Health check endpoint
 app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
+
+// Database test endpoint
+app.MapGet("/db-test", async (SqlConnectionFactory dbFactory) => {
+    try {
+        using var connection = (NpgsqlConnection)dbFactory.CreateConnection();
+        await connection.OpenAsync();
+        
+        using var cmd = new NpgsqlCommand("SELECT version()", connection);
+        var version = await cmd.ExecuteScalarAsync();
+        
+        return Results.Json(new { 
+            success = true, 
+            message = "Connected successfully",
+            version = version?.ToString()
+        });
+    } catch (Exception ex) {
+        return Results.Json(new { success = false, error = ex.Message });
+    }
+});
 
 
 
