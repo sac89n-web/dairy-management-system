@@ -67,8 +67,8 @@
                             <button class="btn btn-sm btn-warning" onclick="editUser(1)">
                                 <i class="fas fa-edit"></i> Edit
                             </button>
-                            <button class="btn btn-sm btn-info" onclick="resetPassword(1)">
-                                <i class="fas fa-key"></i> Reset
+                            <button class="btn btn-sm btn-info" onclick="updatePassword(1)">
+                                <i class="fas fa-key"></i> Update Password
                             </button>
                         </td>
                     </tr>
@@ -215,6 +215,46 @@
     </div>
 </div>
 
+<!-- Update Password Modal -->
+<div class="modal fade" id="updatePasswordModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="UpdatePassword">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Password</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="userId" id="passwordUserId">
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input type="text" class="form-control" id="passwordUsername" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Current Password</label>
+                        <input type="password" class="form-control" name="currentPassword" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">New Password</label>
+                        <input type="password" class="form-control" name="newPassword" id="newPassword" required minlength="6">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Confirm New Password</label>
+                        <input type="password" class="form-control" name="confirmPassword" id="confirmPassword" required>
+                    </div>
+                    <div class="form-text">
+                        Password must be at least 6 characters long.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
 function editUser(userId) {
     // Populate edit modal with user data
@@ -240,10 +280,16 @@ function deleteUser(userId) {
     }
 }
 
-function resetPassword(userId) {
-    if(confirm('Reset password for this user?')) {
-        alert('Password reset link sent to user email!');
+function updatePassword(userId) {
+    const modal = new bootstrap.Modal(document.getElementById('updatePasswordModal'));
+    document.getElementById('passwordUserId').value = userId;
+    
+    // Set username based on userId
+    if(userId === 1) {
+        document.getElementById('passwordUsername').value = 'admin';
     }
+    
+    modal.show();
 }
 
 function activateUser(userId) {
@@ -276,4 +322,21 @@ function filterUsers() {
         row.style.display = matchesSearch && matchesRole && matchesStatus ? '' : 'none';
     });
 }
+
+// Password validation
+document.addEventListener('DOMContentLoaded', function() {
+    const confirmPassword = document.getElementById('confirmPassword');
+    if(confirmPassword) {
+        confirmPassword.addEventListener('input', function() {
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = this.value;
+            
+            if (newPassword !== confirmPassword) {
+                this.setCustomValidity('Passwords do not match');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    }
+});
 </script>
