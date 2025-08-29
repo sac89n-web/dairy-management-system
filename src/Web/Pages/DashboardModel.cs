@@ -6,16 +6,27 @@ using Npgsql;
 public class DashboardModel : BasePageModel
 {
     private readonly SqlConnectionFactory _connectionFactory;
+    private readonly IDashboardService _dashboardService;
+    private readonly IRateEngineService _rateEngine;
 
-    public DashboardModel(SqlConnectionFactory connectionFactory)
+    public DashboardModel(SqlConnectionFactory connectionFactory, IDashboardService dashboardService, IRateEngineService rateEngine)
     {
         _connectionFactory = connectionFactory;
+        _dashboardService = dashboardService;
+        _rateEngine = rateEngine;
     }
 
     public decimal TodayCollection { get; set; }
     public decimal TodaySales { get; set; }
     public decimal TodayRevenue { get; set; }
+    public decimal AvgRateToday { get; set; }
     public int ActiveFarmers { get; set; }
+    public decimal AvgFat { get; set; }
+    public decimal AvgSnf { get; set; }
+    public decimal WeeklyGrowth { get; set; }
+    public List<RateAnalytics> RateAnalytics { get; set; } = new();
+    public List<QualityTrend> QualityTrends { get; set; } = new();
+    public List<RateSlab> ActiveSlabs { get; set; } = new();
     public int LowStockItems { get; set; }
     public int ActiveSubscriptions { get; set; }
     public List<RecentCollection> RecentCollections { get; set; } = new();
@@ -33,28 +44,32 @@ public class DashboardModel : BasePageModel
     {
         using var connection = (NpgsqlConnection)_connectionFactory.CreateConnection();
         
-        // Today's metrics
+        // Initialize rate engine
+        await _rateEngine.EnsureDefaultSlabsAsync();
+        
+        // Get enhanced metrics
+        var metrics = await _dashboardService.GetMetricsAsync();
+        TodayCollection = metrics.TodayCollection;
+        TodayRevenue = metrics.TodayRevenue;
+        AvgRateToday = metrics.AvgRateToday;
+        ActiveFarmers = metrics.ActiveFarmers;
+        AvgFat = metrics.AvgFat;
+        AvgSnf = metrics.AvgSnf;
+        WeeklyGrowth = metrics.WeeklyGrowth;
+        
+        // Get analytics data
+        RateAnalytics = (await _dashboardService.GetRateAnalyticsAsync()).ToList();
+        QualityTrends = (await _dashboardService.GetQualityTrendsAsync()).ToList();
+        ActiveSlabs = (await _rateEngine.GetActiveSlabsAsync()).ToList();
+        
+        // Sales data
         var today = DateTime.Today;
-        TodayCollection = await connection.QuerySingleOrDefaultAsync<decimal>(
-            "SELECT COALESCE(SUM(qty_ltr), 0) FROM dairy.milk_collection WHERE DATE(date) = @today", 
-            new { today });
-            
         TodaySales = await connection.QuerySingleOrDefaultAsync<decimal>(
             "SELECT COALESCE(SUM(qty_ltr), 0) FROM dairy.sale WHERE DATE(date) = @today", 
             new { today });
             
-        TodayRevenue = await connection.QuerySingleOrDefaultAsync<decimal>(
-            "SELECT COALESCE(SUM(paid_amt), 0) FROM dairy.sale WHERE DATE(date) = @today", 
-            new { today });
-            
-        ActiveFarmers = await connection.QuerySingleOrDefaultAsync<int>(
-            "SELECT COUNT(DISTINCT farmer_id) FROM dairy.milk_collection WHERE DATE(date) >= @weekAgo", 
-            new { weekAgo = today.AddDays(-7) });
-            
-        // Get inventory alerts (placeholder)
+        // Placeholder metrics
         LowStockItems = 0;
-            
-        // Get active subscriptions (placeholder)
         ActiveSubscriptions = 0;
 
         // Recent collections

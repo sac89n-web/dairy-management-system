@@ -120,6 +120,7 @@ builder.Services.AddScoped<AuditLogRepository>();
 builder.Services.AddScoped<SettingsCache>();
 builder.Services.AddScoped<WeighingMachineService>();
 builder.Services.AddScoped<IRateEngineService, RateEngineService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 // HTTP Client and DigiLocker Service
 builder.Services.AddHttpClient();

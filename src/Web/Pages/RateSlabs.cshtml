@@ -1,0 +1,202 @@
+@page
+@model RateSlabsModel
+@{
+    ViewData["Title"] = "Rate Slabs Management";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2><i class="fas fa-calculator text-primary"></i> Rate Slabs Management</h2>
+        <p class="text-muted">Configure FAT/SNF based pricing tiers</p>
+    </div>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSlabModal">
+        <i class="fas fa-plus"></i> Add Rate Slab
+    </button>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Active Rate Slabs</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>FAT Range</th>
+                                <th>SNF Range</th>
+                                <th>Base Rate</th>
+                                <th>Incentive</th>
+                                <th>Final Rate</th>
+                                <th>Effective From</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach(var slab in Model.RateSlabs)
+                            {
+                                <tr>
+                                    <td>@slab.FatMin% - @slab.FatMax%</td>
+                                    <td>@slab.SnfMin% - @slab.SnfMax%</td>
+                                    <td>₹@slab.BaseRate</td>
+                                    <td>₹@slab.Incentive</td>
+                                    <td><strong>₹@((slab.BaseRate + slab.Incentive).ToString("F2"))</strong></td>
+                                    <td>@slab.EffectiveFrom.ToString("dd/MM/yyyy")</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteSlab(@slab.Id)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Rate Calculator</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">FAT %</label>
+                    <input type="number" class="form-control" id="fatInput" step="0.1" min="0" max="10" value="4.0">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">SNF %</label>
+                    <input type="number" class="form-control" id="snfInput" step="0.1" min="0" max="15" value="8.5">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Quantity (L)</label>
+                    <input type="number" class="form-control" id="qtyInput" step="0.1" min="0" value="10">
+                </div>
+                <button class="btn btn-primary w-100" onclick="calculateRate()">Calculate Rate</button>
+                <div id="rateResult" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Slab Modal -->
+<div class="modal fade" id="addSlabModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="AddSlab">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Rate Slab</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">FAT Min %</label>
+                                <input type="number" class="form-control" name="fatMin" step="0.1" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">FAT Max %</label>
+                                <input type="number" class="form-control" name="fatMax" step="0.1" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">SNF Min %</label>
+                                <input type="number" class="form-control" name="snfMin" step="0.1" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">SNF Max %</label>
+                                <input type="number" class="form-control" name="snfMax" step="0.1" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Base Rate (₹)</label>
+                                <input type="number" class="form-control" name="baseRate" step="0.01" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Incentive (₹)</label>
+                                <input type="number" class="form-control" name="incentive" step="0.01" value="0">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Effective From</label>
+                        <input type="date" class="form-control" name="effectiveFrom" value="@DateTime.Today.ToString("yyyy-MM-dd")" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Slab</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+async function calculateRate() {
+    const fat = document.getElementById('fatInput').value;
+    const snf = document.getElementById('snfInput').value;
+    const qty = document.getElementById('qtyInput').value;
+    
+    try {
+        const response = await fetch(`/api/rate/calculate?fat=${fat}&snf=${snf}&quantity=${qty}`);
+        const result = await response.json();
+        
+        if (response.ok) {
+            document.getElementById('rateResult').innerHTML = `
+                <div class="alert alert-success">
+                    <strong>Rate: ₹${result.rate}</strong><br>
+                    Base: ₹${result.baseRate} + Incentive: ₹${result.incentive}<br>
+                    Total Amount: ₹${result.totalAmount}<br>
+                    <small>${result.slabInfo}</small>
+                </div>
+            `;
+        } else {
+            document.getElementById('rateResult').innerHTML = `
+                <div class="alert alert-danger">
+                    ${result.error}
+                </div>
+            `;
+        }
+    } catch (error) {
+        document.getElementById('rateResult').innerHTML = `
+            <div class="alert alert-danger">
+                Error calculating rate
+            </div>
+        `;
+    }
+}
+
+async function deleteSlab(id) {
+    if (confirm('Are you sure you want to delete this rate slab?')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '?handler=DeleteSlab';
+        
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'id';
+        input.value = id;
+        form.appendChild(input);
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>

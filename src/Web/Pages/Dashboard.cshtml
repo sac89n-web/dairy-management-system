@@ -38,8 +38,8 @@
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <h6 class="mb-1 opacity-75">Avg FAT / SNF</h6>
-                    <h2 class="mb-1 fw-bold">@Model.AvgFatContent.ToString("F1")% / 8.7%</h2>
-                    <small class="opacity-75">Weighted average</small>
+                    <h2 class="mb-1 fw-bold">@Model.AvgFat.ToString("F1")% / @Model.AvgSnf.ToString("F1")%</h2>
+                    <small class="opacity-75">This week average</small>
                 </div>
                 <i class="fas fa-flask fa-2x opacity-50"></i>
             </div>
@@ -49,9 +49,9 @@
         <div class="metric-card warning">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
-                    <h6 class="mb-1 opacity-75">Payouts Due</h6>
-                    <h2 class="mb-1 fw-bold">₹@Model.TotalOutstanding.ToString("N0")</h2>
-                    <small class="opacity-75">Today</small>
+                    <h6 class="mb-1 opacity-75">Avg Rate Today</h6>
+                    <h2 class="mb-1 fw-bold">₹@Model.AvgRateToday.ToString("F2")</h2>
+                    <small class="opacity-75">Per liter</small>
                 </div>
                 <i class="fas fa-wallet fa-2x opacity-50"></i>
             </div>
@@ -61,9 +61,9 @@
         <div class="metric-card info">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
-                    <h6 class="mb-1 opacity-75">POS Sales</h6>
-                    <h2 class="mb-1 fw-bold">₹@Model.TodayRevenue.ToString("N0")</h2>
-                    <small class="opacity-75">Till now</small>
+                    <h6 class="mb-1 opacity-75">Weekly Growth</h6>
+                    <h2 class="mb-1 fw-bold">@Model.WeeklyGrowth.ToString("F1")%</h2>
+                    <small class="opacity-75">Collection growth</small>
                 </div>
                 <i class="fas fa-receipt fa-2x opacity-50"></i>
             </div>
