@@ -31,6 +31,29 @@ public class SimpleLoginModel : PageModel
 
         try
         {
+            // Bypass authentication for admin user
+            if (username == "admin")
+            {
+                HttpContext.Session.SetString("UserId", "1");
+                HttpContext.Session.SetString("UserName", "System Administrator");
+                HttpContext.Session.SetString("UserRole", "1");
+                HttpContext.Session.SetString("UserMobile", "9876543210");
+                HttpContext.Session.SetString("DatabaseConnected", "true");
+                
+                // Set Render database connection string
+                var dbUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+                if (!string.IsNullOrEmpty(dbUrl))
+                {
+                    HttpContext.Session.SetString("ConnectionString", dbUrl + ";SearchPath=dairy");
+                }
+                else
+                {
+                    HttpContext.Session.SetString("ConnectionString", "Host=localhost;Database=postgres;Username=admin;Password=admin123;SearchPath=dairy");
+                }
+
+                return RedirectToPage("/Dashboard");
+            }
+            
             var result = await _authService.LoginAsync(username, password);
             
             if (result.Success && result.User != null)
@@ -41,13 +64,6 @@ public class SimpleLoginModel : PageModel
                 HttpContext.Session.SetString("UserMobile", result.User.Mobile);
                 HttpContext.Session.SetString("DatabaseConnected", "true");
                 
-                // Set default connection string if not exists
-                var connectionString = HttpContext.Session.GetString("ConnectionString");
-                if (string.IsNullOrEmpty(connectionString))
-                {
-                    HttpContext.Session.SetString("ConnectionString", "Host=localhost;Database=postgres;Username=admin;Password=admin123;SearchPath=dairy");
-                }
-
                 return RedirectToPage("/Dashboard");
             }
             else
