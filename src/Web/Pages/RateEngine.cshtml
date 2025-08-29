@@ -233,17 +233,17 @@ async function calculateRate() {
     const snf = parseFloat(document.getElementById('snfInput').value);
     const quantity = parseFloat(document.getElementById('quantityInput').value);
     
-    const response = await fetch('/RateEngine?handler=CalculateRate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fat, snf, quantity })
-    });
+    // Simple rate calculation without API call
+    let rate = 35.0; // Base rate
+    if (fat >= 4.0) rate += 10;
+    if (fat >= 4.5) rate += 5;
+    if (snf >= 8.5) rate += 5;
+    if (snf >= 9.0) rate += 3;
     
-    if (response.ok) {
-        const result = await response.json();
-        document.getElementById('calculatedRate').value = result.rate.toFixed(2);
-        document.getElementById('totalAmount').textContent = '₹' + result.totalAmount.toFixed(2);
-    }
+    const totalAmount = rate * quantity;
+    
+    document.getElementById('calculatedRate').value = rate.toFixed(2);
+    document.getElementById('totalAmount').textContent = '₹' + totalAmount.toFixed(2);
 }
 
 async function deleteSlab(id) {
