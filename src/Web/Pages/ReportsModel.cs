@@ -80,7 +80,7 @@ public class ReportsModel : BasePageModel
     {
         using var connection = GetConnection();
         var data = await connection.QueryAsync<dynamic>(
-            "SELECT c.name as customer_name, s.qty_ltr as quantity, s.unit_price as rate_per_liter, s.paid_amt as total_amount, s.date as sale_date FROM dairy.sales s JOIN dairy.customer c ON s.customer_id = c.id WHERE s.date BETWEEN @from AND @to ORDER BY s.date",
+            "SELECT c.name as customer_name, s.qty_ltr as quantity, s.unit_price as rate_per_liter, s.paid_amt as total_amount, s.date as sale_date FROM dairy.sale s JOIN dairy.customer c ON s.customer_id = c.id WHERE s.date BETWEEN @from AND @to ORDER BY s.date",
             new { from = fromDate, to = toDate.AddDays(1) });
 
         if (format == "excel")

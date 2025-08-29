@@ -64,8 +64,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddHttpContextAccessor();
 
 // Database and Infrastructure Services
-builder.Services.AddSingleton<SqlConnectionFactory>(sp =>
+builder.Services.AddScoped<SqlConnectionFactory>(sp =>
 {
+    var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
+    var context = httpContextAccessor.HttpContext;
+    
     var dbUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
     
     string connectionString;
@@ -86,9 +89,21 @@ builder.Services.AddSingleton<SqlConnectionFactory>(sp =>
     }
     else
     {
-        // Use local configuration
-        connectionString = builder.Configuration.GetConnectionString("Postgres") ?? 
-                          "Host=localhost;Database=postgres;Username=admin;Password=admin123;SearchPath=dairy";
+        // Use session connection string from login
+        var sessionConnectionString = context?.Session.GetString("ConnectionString");
+        if (!string.IsNullOrEmpty(sessionConnectionString))
+        {
+            connectionString = sessionConnectionString;
+        }
+        else
+        {
+            // Fallback to configuration if available
+            connectionString = builder.Configuration.GetConnectionString("Postgres");
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                throw new InvalidOperationException("No database connection available. Please login first.");
+            }
+        }
     }
     
     return new SqlConnectionFactory(connectionString);
@@ -140,7 +155,7 @@ app.UseSession();
 // Authentication middleware
 app.Use(async (context, next) =>
 {
-    var publicPaths = new[] { "/simple-login", "/login", "/database-login", "/health", "/api/test-db", "/swagger", "/api" };
+    var publicPaths = new[] { "/simple-login", "/login", "/database-login", "/health", "/api/test-db", "/swagger", "/api", "/list-tables", "/db-test", "/setup-db" };
     
     if (!publicPaths.Any(p => context.Request.Path.StartsWithSegments(p)) && 
         context.Session.GetString("UserId") == null)
