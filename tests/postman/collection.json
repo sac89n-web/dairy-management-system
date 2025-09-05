@@ -1,0 +1,330 @@
+{
+  "info": {
+    "name": "Dairy Management System API Tests",
+    "description": "Comprehensive API testing for dairy management system",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": {
+      "major": 1,
+      "minor": 0,
+      "patch": 0
+    }
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{API_KEY}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "collectionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "farmerId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "orderId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{API_BASE_URL}}/api/auth/login",
+              "host": ["{{API_BASE_URL}}"],
+              "path": ["api", "auth", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Login successful', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Token received', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('token');",
+                  "    pm.collectionVariables.set('API_KEY', jsonData.token);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Farmers",
+      "item": [
+        {
+          "name": "Create Farmer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Farmer {{$randomInt}}\",\n  \"code\": \"TF{{$randomInt}}\",\n  \"contact\": \"98765{{$randomInt}}\",\n  \"bankAccount\": \"{{$randomBankAccount}}\",\n  \"ifscCode\": \"SBIN0001234\",\n  \"branchId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{API_BASE_URL}}/api/farmers",
+              "host": ["{{API_BASE_URL}}"],
+              "path": ["api", "farmers"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Farmer created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has required fields', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData).to.have.property('name');",
+                  "    pm.expect(jsonData).to.have.property('code');",
+                  "    pm.collectionVariables.set('farmerId', jsonData.id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Farmers",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{API_BASE_URL}}/api/farmers",
+              "host": ["{{API_BASE_URL}}"],
+              "path": ["api", "farmers"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Farmers retrieved', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is array', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Collections",
+      "item": [
+        {
+          "name": "Create Collection - Valid",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"farmerId\": {{farmerId}},\n  \"shiftId\": 1,\n  \"date\": \"{{$isoTimestamp}}\",\n  \"weightKg\": {{$randomInt}},\n  \"fat\": 4.2,\n  \"snf\": 8.8,\n  \"rate\": 52.50\n}"
+            },
+            "url": {
+              "raw": "{{API_BASE_URL}}/api/collections",
+              "host": ["{{API_BASE_URL}}"],
+              "path": ["api", "collections"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Collection created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response schema valid', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData).to.have.property('farmerId');",
+                  "    pm.expect(jsonData).to.have.property('weightKg');",
+                  "    pm.expect(jsonData).to.have.property('fat');",
+                  "    pm.expect(jsonData).to.have.property('snf');",
+                  "    pm.expect(jsonData).to.have.property('amount');",
+                  "    pm.collectionVariables.set('collectionId', jsonData.id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Collection - Invalid FAT",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"farmerId\": {{farmerId}},\n  \"shiftId\": 1,\n  \"date\": \"{{$isoTimestamp}}\",\n  \"weightKg\": 25,\n  \"fat\": 16.0,\n  \"snf\": 8.8,\n  \"rate\": 52.50\n}"
+            },
+            "url": {
+              "raw": "{{API_BASE_URL}}/api/collections",
+              "host": ["{{API_BASE_URL}}"],
+              "path": ["api", "collections"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Invalid FAT rejected', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Error message present', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('error');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "POS",
+      "item": [
+        {
+          "name": "Create Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": 1,\n  \"items\": [\n    {\n      \"productId\": 1,\n      \"quantity\": 2,\n      \"unitPrice\": 60.00\n    }\n  ],\n  \"paymentMethod\": \"UPI\"\n}"
+            },
+            "url": {
+              "raw": "{{API_BASE_URL}}/api/pos/orders",
+              "host": ["{{API_BASE_URL}}"],
+              "path": ["api", "pos", "orders"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Order created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Invoice generated', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('orderId');",
+                  "    pm.expect(jsonData).to.have.property('invoiceNumber');",
+                  "    pm.collectionVariables.set('orderId', jsonData.orderId);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": {{orderId}},\n  \"amount\": 120.00,\n  \"paymentMethod\": \"UPI\",\n  \"transactionId\": \"UPI{{$randomInt}}\"\n}"
+            },
+            "url": {
+              "raw": "{{API_BASE_URL}}/api/pos/payments",
+              "host": ["{{API_BASE_URL}}"],
+              "path": ["api", "pos", "payments"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Payment processed', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Payment confirmed', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('status');",
+                  "    pm.expect(jsonData.status).to.eql('confirmed');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

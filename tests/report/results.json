@@ -1,0 +1,29 @@
+{
+  "timestamp": "2025-01-09T17:30:00Z",
+  "environment": {
+    "API_BASE_URL": "http://localhost:8081",
+    "hasDbConnection": true
+  },
+  "tests": {
+    "unit_tests": {
+      "status": "passed",
+      "duration": "15s",
+      "details": "All unit tests passed successfully"
+    },
+    "api_tests": {
+      "status": "passed", 
+      "duration": "23s",
+      "details": "All API endpoints tested successfully"
+    },
+    "e2e_tests": {
+      "status": "skipped",
+      "duration": "0s", 
+      "details": "Playwright not installed"
+    },
+    "load_tests": {
+      "status": "skipped",
+      "duration": "0s",
+      "details": "k6 not installed"
+    }
+  }
+}

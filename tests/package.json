@@ -1,0 +1,21 @@
+{
+  "name": "dairy-management-tests",
+  "version": "1.0.0",
+  "description": "Test suite for Dairy Management System",
+  "scripts": {
+    "test:postman": "cd newman && bash run.sh",
+    "test:backend": "dotnet test backend/Dairy.Api.Tests",
+    "test:playwright": "npx playwright test --project=chromium frontend/playwright",
+    "test:load": "k6 run load/k6/collections.js",
+    "test:all": "bash scripts/run-all.sh",
+    "install:deps": "npm install -g newman @playwright/test && npx playwright install"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "newman": "^6.0.0",
+    "newman-reporter-htmlextra": "^1.23.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
