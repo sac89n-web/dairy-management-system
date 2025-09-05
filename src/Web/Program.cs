@@ -76,15 +76,16 @@ builder.Services.AddScoped<SqlConnectionFactory>(sp =>
     {
         if (dbUrl.StartsWith("postgresql://"))
         {
-            // Parse Render DATABASE_URL format
+            // Parse Render DATABASE_URL format: postgresql://user:password@host:port/database
             var uri = new Uri(dbUrl);
             var userInfo = uri.UserInfo.Split(':');
-            connectionString = $"Host={uri.Host};Port={uri.Port};Database=postgres;Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true;SearchPath=dairy";
+            var database = uri.AbsolutePath.TrimStart('/');
+            connectionString = $"Host={uri.Host};Port={uri.Port};Database={database};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true;SearchPath=dairy";
         }
         else
         {
             // Direct connection string format
-            connectionString = dbUrl + ";SearchPath=dairy";
+            connectionString = dbUrl + (dbUrl.Contains("SearchPath") ? "" : ";SearchPath=dairy");
         }
     }
     else
@@ -97,12 +98,8 @@ builder.Services.AddScoped<SqlConnectionFactory>(sp =>
         }
         else
         {
-            // Fallback to configuration if available
-            connectionString = builder.Configuration.GetConnectionString("Postgres");
-            if (string.IsNullOrEmpty(connectionString))
-            {
-                throw new InvalidOperationException("No database connection available. Please login first.");
-            }
+            // Fallback to local development connection
+            connectionString = "Host=localhost;Database=postgres;Username=admin;Password=admin123;SearchPath=dairy";
         }
     }
     
@@ -223,27 +220,63 @@ app.MapPost("/api/sales", SaleEndpoints.Add);
 app.MapGet("/api/rate/calculate", RateEndpoints.CalculateRate);
 app.MapGet("/api/rate/slabs", RateEndpoints.GetActiveSlabs);
 
-// Database test endpoint
+// Enhanced database test endpoint
 app.MapGet("/api/test-db", async (SqlConnectionFactory dbFactory) => {
     try {
         using var connection = (Npgsql.NpgsqlConnection)dbFactory.CreateConnection();
         await connection.OpenAsync();
         
-        using var cmd = new Npgsql.NpgsqlCommand("SELECT version()", connection);
-        var version = await cmd.ExecuteScalarAsync();
+        // Test basic connection
+        using var versionCmd = new Npgsql.NpgsqlCommand("SELECT version()", connection);
+        var version = await versionCmd.ExecuteScalarAsync();
+        
+        // Test dairy schema
+        using var schemaCmd = new Npgsql.NpgsqlCommand("SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name = 'dairy'", connection);
+        var schemaExists = Convert.ToInt32(await schemaCmd.ExecuteScalarAsync()) > 0;
+        
+        // Test table count
+        using var tableCmd = new Npgsql.NpgsqlCommand("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'dairy'", connection);
+        var tableCount = Convert.ToInt32(await tableCmd.ExecuteScalarAsync());
         
         return Results.Json(new { 
             success = true, 
-            message = "Connected successfully",
-            version = version?.ToString()
+            message = "Database connection successful",
+            version = version?.ToString(),
+            schemaExists = schemaExists,
+            tableCount = tableCount,
+            connectionString = connection.ConnectionString.Contains("Password=") ? 
+                connection.ConnectionString.Substring(0, connection.ConnectionString.IndexOf("Password=")) + "Password=***" :
+                connection.ConnectionString
         });
     } catch (Exception ex) {
-        return Results.Json(new { success = false, error = ex.Message });
+        return Results.Json(new { 
+            success = false, 
+            error = ex.Message,
+            stackTrace = ex.StackTrace
+        });
     }
 });
 
-// Health check endpoint
-app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
+// Enhanced health check endpoint
+app.MapGet("/health", async (SqlConnectionFactory dbFactory) => {
+    var health = new {
+        status = "healthy",
+        timestamp = DateTime.UtcNow,
+        version = "1.0.0",
+        environment = app.Environment.EnvironmentName,
+        database = "unknown"
+    };
+    
+    try {
+        using var connection = (NpgsqlConnection)dbFactory.CreateConnection();
+        await connection.OpenAsync();
+        health = health with { database = "connected" };
+    } catch {
+        health = health with { database = "disconnected", status = "degraded" };
+    }
+    
+    return Results.Ok(health);
+});
 
 // Database test endpoint
 app.MapGet("/db-test", async (SqlConnectionFactory dbFactory) => {
@@ -264,25 +297,39 @@ app.MapGet("/db-test", async (SqlConnectionFactory dbFactory) => {
     }
 });
 
-// List all tables endpoint
+// List all tables endpoint with detailed schema info
 app.MapGet("/list-tables", async (SqlConnectionFactory dbFactory) => {
     try {
         using var connection = (NpgsqlConnection)dbFactory.CreateConnection();
         await connection.OpenAsync();
         
-        using var cmd = new NpgsqlCommand("SELECT table_name FROM information_schema.tables WHERE table_schema = 'dairy' ORDER BY table_name", connection);
+        using var cmd = new NpgsqlCommand(@"
+            SELECT 
+                t.table_name,
+                COUNT(c.column_name) as column_count,
+                string_agg(c.column_name, ', ' ORDER BY c.ordinal_position) as columns
+            FROM information_schema.tables t
+            LEFT JOIN information_schema.columns c ON t.table_name = c.table_name AND t.table_schema = c.table_schema
+            WHERE t.table_schema = 'dairy'
+            GROUP BY t.table_name
+            ORDER BY t.table_name", connection);
         using var reader = await cmd.ExecuteReaderAsync();
         
-        var tables = new List<string>();
+        var tables = new List<object>();
         while (await reader.ReadAsync())
         {
-            tables.Add(reader.GetString(0));
+            tables.Add(new {
+                name = reader.GetString(0),
+                columnCount = reader.GetInt32(1),
+                columns = reader.IsDBNull(2) ? "" : reader.GetString(2)
+            });
         }
         
         return Results.Json(new { 
             success = true, 
             count = tables.Count,
-            tables = tables
+            tables = tables,
+            schema = "dairy"
         });
     } catch (Exception ex) {
         return Results.Json(new { success = false, error = ex.Message });
@@ -295,103 +342,64 @@ app.MapGet("/setup-db", async (SqlConnectionFactory dbFactory) => {
         using var connection = (NpgsqlConnection)dbFactory.CreateConnection();
         await connection.OpenAsync();
         
-        var setupSql = @"
+        // Read the complete schema file
+        var schemaPath = Path.Combine(Directory.GetCurrentDirectory(), "complete_schema_sync.sql");
+        string setupSql;
+        
+        if (File.Exists(schemaPath))
+        {
+            setupSql = await File.ReadAllTextAsync(schemaPath);
+        }
+        else
+        {
+            // Fallback minimal schema
+            setupSql = @"
+CREATE SCHEMA IF NOT EXISTS dairy;
 SET search_path TO dairy;
 
-CREATE TABLE IF NOT EXISTS bank (
+CREATE TABLE IF NOT EXISTS branch (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL
+    name VARCHAR(100) NOT NULL,
+    address TEXT,
+    contact VARCHAR(15)
 );
 
-CREATE TABLE IF NOT EXISTS expense_category (
+CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL
+    username VARCHAR(50) UNIQUE NOT NULL,
+    full_name VARCHAR(100) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    role INTEGER DEFAULT 1,
+    is_active BOOLEAN DEFAULT TRUE
 );
 
-CREATE TABLE IF NOT EXISTS item (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL
-);
+INSERT INTO branch (name, address, contact) 
+SELECT 'Main Branch', '123 Dairy Lane', '9876543210'
+WHERE NOT EXISTS (SELECT 1 FROM branch);
 
-CREATE TABLE IF NOT EXISTS payment_customer (
-    id SERIAL PRIMARY KEY,
-    customer_id INTEGER REFERENCES customer(id),
-    sale_id INTEGER REFERENCES sale(id),
-    amount NUMERIC(12,2) NOT NULL,
-    date DATE NOT NULL,
-    invoice_no VARCHAR(30) UNIQUE,
-    pdf_path VARCHAR(255)
-);
-
-CREATE TABLE IF NOT EXISTS audit_log (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER,
-    action VARCHAR(100) NOT NULL,
-    entity VARCHAR(50),
-    entity_id INTEGER,
-    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    details TEXT
-);
-
-CREATE TABLE IF NOT EXISTS settings (
-    id SERIAL PRIMARY KEY,
-    system_name VARCHAR(100) NOT NULL,
-    contact VARCHAR(50) NOT NULL,
-    address TEXT NOT NULL
-);
-
-INSERT INTO bank (name) VALUES ('State Bank of India') ON CONFLICT DO NOTHING;
-INSERT INTO expense_category (name) VALUES ('Transport') ON CONFLICT DO NOTHING;
-INSERT INTO item (name) VALUES ('Milk') ON CONFLICT DO NOTHING;
-INSERT INTO settings (system_name, contact, address) VALUES ('Dairy Management System', '9876543210', '123 Dairy Lane') ON CONFLICT DO NOTHING;F NOT EXISTS milk_collection (
-    id SERIAL PRIMARY KEY,
-    farmer_id INTEGER REFERENCES farmer(id),
-    shift_id INTEGER REFERENCES shift(id),
-    date DATE NOT NULL,
-    qty_ltr NUMERIC(8,2) NOT NULL,
-    fat_pct NUMERIC(4,2) NOT NULL,
-    price_per_ltr NUMERIC(8,2) NOT NULL,
-    due_amt NUMERIC(12,2) NOT NULL,
-    notes TEXT,
-    created_by INTEGER REFERENCES employee(id)
-);
-
-CREATE TABLE IF NOT EXISTS sale (
-    id SERIAL PRIMARY KEY,
-    customer_id INTEGER REFERENCES customer(id),
-    shift_id INTEGER REFERENCES shift(id),
-    date DATE NOT NULL,
-    qty_ltr NUMERIC(8,2) NOT NULL,
-    unit_price NUMERIC(8,2) NOT NULL,
-    discount NUMERIC(8,2) DEFAULT 0,
-    paid_amt NUMERIC(12,2) NOT NULL,
-    due_amt NUMERIC(12,2) NOT NULL,
-    created_by INTEGER REFERENCES employee(id)
-);
-
-CREATE TABLE IF NOT EXISTS payment_farmer (
-    id SERIAL PRIMARY KEY,
-    farmer_id INTEGER REFERENCES farmer(id),
-    milk_collection_id INTEGER REFERENCES milk_collection(id),
-    amount NUMERIC(12,2) NOT NULL,
-    date DATE NOT NULL,
-    invoice_no VARCHAR(30) UNIQUE,
-    pdf_path VARCHAR(255)
-);
-
-INSERT INTO branch (name, address, contact) VALUES ('Main Branch', '123 Dairy Lane', '9876543210') ON CONFLICT DO NOTHING;
-INSERT INTO employee (name, contact, branch_id, role) VALUES ('Admin User', '9999999999', 1, 'Admin') ON CONFLICT DO NOTHING;
-INSERT INTO farmer (name, code, contact, branch_id) VALUES ('Farmer A', 'F001', '7777777777', 1) ON CONFLICT (code) DO NOTHING;
-INSERT INTO customer (name, contact, branch_id) VALUES ('Customer X', '5555555555', 1) ON CONFLICT DO NOTHING;
-INSERT INTO shift (name, start_time, end_time) VALUES ('Morning', '06:00', '10:00') ON CONFLICT DO NOTHING;
+INSERT INTO users (username, full_name, password_hash, role, is_active) 
+SELECT 'admin', 'System Administrator', 'admin123', 1, TRUE
+WHERE NOT EXISTS (SELECT 1 FROM users WHERE username = 'admin');
 ";
+        }
         
         using var cmd = new NpgsqlCommand(setupSql, connection);
         await cmd.ExecuteNonQueryAsync();
         
-        return Results.Json(new { success = true, message = "Database setup completed" });
+        // Verify setup
+        using var verifyCmd = new NpgsqlCommand(@"
+            SELECT COUNT(*) as table_count 
+            FROM information_schema.tables 
+            WHERE table_schema = 'dairy'", connection);
+        var tableCount = await verifyCmd.ExecuteScalarAsync();
+        
+        return Results.Json(new { 
+            success = true, 
+            message = "Database setup completed successfully",
+            tablesCreated = tableCount
+        });
     } catch (Exception ex) {
-        return Results.Json(new { success = false, error = ex.Message });
+        return Results.Json(new { success = false, error = ex.Message, stackTrace = ex.StackTrace });
     }
 });
 
