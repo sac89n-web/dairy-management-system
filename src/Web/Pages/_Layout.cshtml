@@ -8,7 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        .sidebar { width: 260px; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: fixed; top: 0; left: 0; z-index: 1000; transition: transform 0.3s; }
+        .sidebar { width: 260px; height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: fixed; top: 0; left: 0; z-index: 1000; transition: transform 0.3s; overflow-y: auto; }
         .sidebar-collapsed { transform: translateX(-100%); }
         .main-content { margin-left: 260px; transition: margin-left 0.3s; }
         .main-content.expanded { margin-left: 0; }
@@ -56,7 +56,7 @@
             <div class="nav-item-custom" onclick="navigate('/MasterData')">
                 <i class="fas fa-users me-2"></i> Farmers & Customers
             </div>
-            <div class="nav-item-custom" onclick="navigate('/PaymentGateway')">
+            <div class="nav-item-custom" onclick="navigate('/Payments')">
                 <i class="fas fa-wallet me-2"></i> Payouts & Ledger
             </div>
             <div class="nav-item-custom" onclick="navigate('/Sales')">
@@ -80,9 +80,7 @@
             <div class="nav-item-custom" onclick="navigate('/RateEngine')">
                 <i class="fas fa-calculator me-2"></i> Rate Engine
             </div>
-            <div class="nav-item-custom" onclick="navigate('/KYCVerification')">
-                <i class="fas fa-shield-check me-2"></i> KYC Verification
-            </div>
+
             
             <!-- Security Section -->
             <div class="text-white-50 px-3 mt-3 mb-2 small fw-bold">SECURITY</div>
@@ -103,6 +101,42 @@
             </div>
             <div class="nav-item-custom" onclick="navigate('/QualityControl')">
                 <i class="fas fa-flask me-2"></i> Quality Control
+            </div>
+            <div class="nav-item-custom" onclick="navigate('/IntegratedCollection')">
+                <i class="fas fa-robot me-2"></i> Integrated Collection
+            </div>
+            <div class="nav-item-custom" onclick="navigate('/HardwareData')">
+                <i class="fas fa-database me-2"></i> Hardware Data
+            </div>
+            
+            <!-- Phase 3: KYC, Payments & Notifications -->
+            <div class="text-white-50 px-3 mt-3 mb-2 small fw-bold">PHASE 3: PAYMENTS</div>
+            <div class="nav-item-custom" onclick="navigate('/EnhancedKyc')">
+                <i class="fas fa-id-badge me-2"></i> Enhanced KYC
+            </div>
+            <div class="nav-item-custom" onclick="navigate('/PaymentManagement')">
+                <i class="fas fa-credit-card me-2"></i> Payment Management
+            </div>
+            <div class="nav-item-custom" onclick="navigate('/NotificationCenter')">
+                <i class="fas fa-bell me-2"></i> Notification Center
+            </div>
+            
+            <!-- Phase 4: Advanced Analytics & Enterprise -->
+            <div class="text-white-50 px-3 mt-3 mb-2 small fw-bold">PHASE 4: ENTERPRISE</div>
+            <div class="nav-item-custom" onclick="navigate('/AdvancedAnalytics')">
+                <i class="fas fa-chart-line me-2"></i> Advanced Analytics
+            </div>
+            <div class="nav-item-custom" onclick="navigate('/BranchManagement')">
+                <i class="fas fa-sitemap me-2"></i> Multi-Branch
+            </div>
+            <div class="nav-item-custom" onclick="navigate('/MobileApp')">
+                <i class="fas fa-mobile-alt me-2"></i> Mobile App
+            </div>
+            <div class="nav-item-custom" onclick="navigate('/SupplyChain')">
+                <i class="fas fa-truck me-2"></i> Supply Chain
+            </div>
+            <div class="nav-item-custom" onclick="navigate('/CloudMonitoring')">
+                <i class="fas fa-cloud me-2"></i> Cloud Monitoring
             </div>
         </div>
         <div class="mt-4 px-3">

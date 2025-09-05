@@ -1,0 +1,494 @@
+@page "/feedback-features"
+@{
+    ViewData["Title"] = "Feedback Implementation - Advanced Features";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">🚀 Feedback Implementation - Advanced Dairy Management Features</h2>
+            <p class="text-muted">Based on Ramesh Ghodake's feedback for competitive dairy management system</p>
+        </div>
+    </div>
+
+    <!-- KPI Dashboard -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>📊 Real-time KPI Dashboard</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row" id="kpi-dashboard">
+                        <div class="col-md-3">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body">
+                                    <h6>Total Farmers</h6>
+                                    <h3 id="total-farmers">-</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body">
+                                    <h6>Milk Collected (L)</h6>
+                                    <h3 id="total-milk">-</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body">
+                                    <h6>Payment Cycles</h6>
+                                    <h3 id="payment-cycles">-</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-danger text-white">
+                                <div class="card-body">
+                                    <h6>Quality Alerts</h6>
+                                    <h3 id="quality-alerts">-</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feature Tabs -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs" id="feature-tabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="payment-cycles-tab" data-bs-toggle="tab" data-bs-target="#payment-cycles" type="button" role="tab">
+                                💰 Payment Cycles (10-Day)
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="bonus-management-tab" data-bs-toggle="tab" data-bs-target="#bonus-management" type="button" role="tab">
+                                🎁 Bonus Management
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="notifications-tab" data-bs-toggle="tab" data-bs-target="#notifications" type="button" role="tab">
+                                📱 Notifications & Alerts
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab">
+                                📈 Advanced Analytics
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content" id="feature-tab-content">
+                        <!-- Payment Cycles Tab -->
+                        <div class="tab-pane fade show active" id="payment-cycles" role="tabpanel">
+                            <h5>10-Day Payment Cycle Management</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">Create New Payment Cycle</div>
+                                        <div class="card-body">
+                                            <form id="create-cycle-form">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Start Date</label>
+                                                    <input type="date" class="form-control" id="cycle-start-date" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">End Date</label>
+                                                    <input type="date" class="form-control" id="cycle-end-date" required>
+                                                </div>
+                                                <button type="submit" class="btn btn-primary">Create Cycle</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">Bank File Generation</div>
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <label class="form-label">Select Cycle</label>
+                                                <select class="form-control" id="bank-cycle-select">
+                                                    <option value="">Select a cycle...</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Bank</label>
+                                                <select class="form-control" id="bank-select">
+                                                    <option value="SBI">State Bank of India</option>
+                                                    <option value="ICICI">ICICI Bank</option>
+                                                    <option value="HDFC">HDFC Bank</option>
+                                                </select>
+                                            </div>
+                                            <button type="button" class="btn btn-success" onclick="generateBankFile()">Generate Bank File</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bonus Management Tab -->
+                        <div class="tab-pane fade" id="bonus-management" role="tabpanel">
+                            <h5>Bonus Distribution System</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">Calculate Bonus</div>
+                                        <div class="card-body">
+                                            <form id="calculate-bonus-form">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Bonus Type</label>
+                                                    <select class="form-control" id="bonus-type" required>
+                                                        <option value="half_yearly">Half-Yearly Bonus</option>
+                                                        <option value="yearly">Yearly Bonus</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Period Start</label>
+                                                    <input type="date" class="form-control" id="bonus-start-date" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Period End</label>
+                                                    <input type="date" class="form-control" id="bonus-end-date" required>
+                                                </div>
+                                                <button type="submit" class="btn btn-primary">Calculate Bonus</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">Bonus Configurations</div>
+                                        <div class="card-body">
+                                            <div id="bonus-configs">
+                                                <p class="text-muted">Loading configurations...</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notifications Tab -->
+                        <div class="tab-pane fade" id="notifications" role="tabpanel">
+                            <h5>SMS/WhatsApp Notifications & System Alerts</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">Send Test Notification</div>
+                                        <div class="card-body">
+                                            <form id="test-notification-form">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Farmer ID</label>
+                                                    <input type="number" class="form-control" id="test-farmer-id" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Notification Type</label>
+                                                    <select class="form-control" id="notification-type" required>
+                                                        <option value="quality_alert">Quality Alert</option>
+                                                        <option value="payment_cycle">Payment Notification</option>
+                                                        <option value="bonus_payout">Bonus Notification</option>
+                                                    </select>
+                                                </div>
+                                                <button type="submit" class="btn btn-primary">Send Test Notification</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">System Alerts</div>
+                                        <div class="card-body">
+                                            <div id="system-alerts" style="max-height: 300px; overflow-y: auto;">
+                                                <p class="text-muted">Loading alerts...</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Analytics Tab -->
+                        <div class="tab-pane fade" id="analytics" role="tabpanel">
+                            <h5>Advanced Reports & Analytics</h5>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="card">
+                                        <div class="card-header">Export Reports</div>
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <label class="form-label">Report Type</label>
+                                                <select class="form-control" id="report-type">
+                                                    <option value="farmer_performance">Farmer Performance</option>
+                                                    <option value="quality_trend">Quality Trend</option>
+                                                    <option value="payment_summary">Payment Summary</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">From Date</label>
+                                                <input type="date" class="form-control" id="report-from-date">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">To Date</label>
+                                                <input type="date" class="form-control" id="report-to-date">
+                                            </div>
+                                            <button type="button" class="btn btn-success" onclick="exportReport()">Export to Excel</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card">
+                                        <div class="card-header">Performance Metrics</div>
+                                        <div class="card-body">
+                                            <div id="performance-chart">
+                                                <p class="text-muted">Performance charts will be displayed here...</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Load KPI Dashboard
+async function loadKpiDashboard() {
+    try {
+        const response = await fetch('/api/feedback-features/analytics/dashboard-kpis');
+        const result = await response.json();
+        
+        if (result.success) {
+            const kpis = result.data;
+            document.getElementById('total-farmers').textContent = kpis.totalFarmers;
+            document.getElementById('total-milk').textContent = kpis.totalMilkCollected.toFixed(1);
+            document.getElementById('payment-cycles').textContent = kpis.totalPaymentCycles;
+            document.getElementById('quality-alerts').textContent = kpis.qualityAlertsCount;
+        }
+    } catch (error) {
+        console.error('Error loading KPIs:', error);
+    }
+}
+
+// Create Payment Cycle
+document.getElementById('create-cycle-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const startDate = document.getElementById('cycle-start-date').value;
+    const endDate = document.getElementById('cycle-end-date').value;
+    
+    try {
+        const response = await fetch('/api/feedback-features/payment-cycles', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ startDate, endDate })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('Payment cycle created successfully! Cycle ID: ' + result.cycleId);
+            loadKpiDashboard();
+        } else {
+            alert('Error: ' + result.error);
+        }
+    } catch (error) {
+        alert('Error creating payment cycle: ' + error.message);
+    }
+});
+
+// Calculate Bonus
+document.getElementById('calculate-bonus-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const bonusType = document.getElementById('bonus-type').value;
+    const startDate = document.getElementById('bonus-start-date').value;
+    const endDate = document.getElementById('bonus-end-date').value;
+    
+    const endpoint = bonusType === 'half_yearly' ? 
+        '/api/feedback-features/bonus/calculate-half-yearly' : 
+        '/api/feedback-features/bonus/calculate-yearly';
+    
+    try {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ periodStart: startDate, periodEnd: endDate })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert(`Bonus calculated for ${result.count} farmers!`);
+        } else {
+            alert('Error: ' + result.error);
+        }
+    } catch (error) {
+        alert('Error calculating bonus: ' + error.message);
+    }
+});
+
+// Generate Bank File
+async function generateBankFile() {
+    const cycleId = document.getElementById('bank-cycle-select').value;
+    const bankName = document.getElementById('bank-select').value;
+    
+    if (!cycleId) {
+        alert('Please select a payment cycle');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/feedback-features/payment-cycles/${cycleId}/bank-file?bankName=${bankName}`, {
+            method: 'POST'
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('Bank file generated successfully: ' + result.filePath);
+        } else {
+            alert('Error: ' + result.error);
+        }
+    } catch (error) {
+        alert('Error generating bank file: ' + error.message);
+    }
+}
+
+// Export Report
+async function exportReport() {
+    const reportType = document.getElementById('report-type').value;
+    const fromDate = document.getElementById('report-from-date').value;
+    const toDate = document.getElementById('report-to-date').value;
+    
+    if (!fromDate || !toDate) {
+        alert('Please select date range');
+        return;
+    }
+    
+    try {
+        const url = `/api/feedback-features/analytics/export/${reportType}?fromDate=${fromDate}&toDate=${toDate}`;
+        window.open(url, '_blank');
+    } catch (error) {
+        alert('Error exporting report: ' + error.message);
+    }
+}
+
+// Load System Alerts
+async function loadSystemAlerts() {
+    try {
+        const response = await fetch('/api/feedback-features/notifications/alerts');
+        const result = await response.json();
+        
+        if (result.success) {
+            const alertsContainer = document.getElementById('system-alerts');
+            alertsContainer.innerHTML = '';
+            
+            if (result.data.length === 0) {
+                alertsContainer.innerHTML = '<p class="text-success">No unresolved alerts</p>';
+            } else {
+                result.data.forEach(alert => {
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = `alert alert-${alert.severity === 'high' ? 'danger' : 'warning'} alert-sm`;
+                    alertDiv.innerHTML = `
+                        <strong>${alert.title}</strong><br>
+                        <small>${alert.message}</small><br>
+                        <small class="text-muted">${new Date(alert.createdAt).toLocaleString()}</small>
+                    `;
+                    alertsContainer.appendChild(alertDiv);
+                });
+            }
+        }
+    } catch (error) {
+        console.error('Error loading alerts:', error);
+    }
+}
+
+// Load Bonus Configurations
+async function loadBonusConfigurations() {
+    try {
+        const response = await fetch('/api/feedback-features/bonus/configurations');
+        const result = await response.json();
+        
+        if (result.success) {
+            const configsContainer = document.getElementById('bonus-configs');
+            configsContainer.innerHTML = '';
+            
+            result.data.forEach(config => {
+                const configDiv = document.createElement('div');
+                configDiv.className = 'mb-2 p-2 border rounded';
+                configDiv.innerHTML = `
+                    <strong>${config.configName}</strong><br>
+                    <small>Type: ${config.bonusType} | Method: ${config.calculationMethod}</small><br>
+                    <small class="text-muted">Active: ${config.isActive ? 'Yes' : 'No'}</small>
+                `;
+                configsContainer.appendChild(configDiv);
+            });
+        }
+    } catch (error) {
+        console.error('Error loading bonus configurations:', error);
+    }
+}
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', () => {
+    loadKpiDashboard();
+    loadSystemAlerts();
+    loadBonusConfigurations();
+    
+    // Set default dates
+    const today = new Date().toISOString().split('T')[0];
+    const tenDaysAgo = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    
+    document.getElementById('cycle-start-date').value = tenDaysAgo;
+    document.getElementById('cycle-end-date').value = today;
+    document.getElementById('report-from-date').value = tenDaysAgo;
+    document.getElementById('report-to-date').value = today;
+    
+    // Set bonus dates (6 months ago to today)
+    const sixMonthsAgo = new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    document.getElementById('bonus-start-date').value = sixMonthsAgo;
+    document.getElementById('bonus-end-date').value = today;
+});
+</script>
+
+<style>
+.card {
+    margin-bottom: 1rem;
+}
+
+.alert-sm {
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.nav-tabs .nav-link {
+    font-weight: 500;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+#kpi-dashboard .card {
+    margin-bottom: 0;
+}
+
+#kpi-dashboard h3 {
+    font-size: 2rem;
+    font-weight: bold;
+}
+</style>

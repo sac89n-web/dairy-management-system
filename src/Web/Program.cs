@@ -79,7 +79,7 @@ builder.Services.AddScoped<SqlConnectionFactory>(sp =>
             // Parse Render DATABASE_URL format
             var uri = new Uri(dbUrl);
             var userInfo = uri.UserInfo.Split(':');
-            connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.Trim('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true;SearchPath=dairy";
+            connectionString = $"Host={uri.Host};Port={uri.Port};Database=postgres;Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true;SearchPath=dairy";
         }
         else
         {
@@ -115,6 +115,7 @@ builder.Services.AddScoped<SaleRepository>();
 builder.Services.AddScoped<PaymentFarmerRepository>();
 builder.Services.AddScoped<PaymentCustomerRepository>();
 builder.Services.AddScoped<AuditLogRepository>();
+builder.Services.AddScoped<HardwareRepository>();
 
 // Application Services
 builder.Services.AddScoped<SettingsCache>();
@@ -123,10 +124,31 @@ builder.Services.AddScoped<IRateEngineService, RateEngineService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+// Feedback Implementation Services
+builder.Services.AddScoped<IPaymentCycleService, PaymentCycleService>();
+builder.Services.AddScoped<IBonusService, BonusService>();
+builder.Services.AddScoped<IAdvancedNotificationService, AdvancedNotificationService>();
+builder.Services.AddScoped<IAdvancedAnalyticsService, AdvancedAnalyticsService>();
+
 // HTTP Client and DigiLocker Service
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<Dairy.Web.Services.DigiLockerService>();
 builder.Services.AddScoped<Dairy.Web.Services.DatabaseSettingsService>();
+
+// Phase 2: Hardware Services
+builder.Services.AddScoped<Dairy.Infrastructure.HardwareServices.IDigitalScaleService, Dairy.Infrastructure.HardwareServices.DigitalScaleService>();
+builder.Services.AddScoped<Dairy.Infrastructure.HardwareServices.IMilkAnalyzerService, Dairy.Infrastructure.HardwareServices.MilkAnalyzerService>();
+builder.Services.AddScoped<Dairy.Infrastructure.HardwareServices.IThermalPrinterService, Dairy.Infrastructure.HardwareServices.ThermalPrinterService>();
+builder.Services.AddScoped<Dairy.Infrastructure.HardwareServices.IRfidService, Dairy.Infrastructure.HardwareServices.RfidService>();
+builder.Services.AddScoped<Dairy.Infrastructure.HardwareServices.IHardwareIntegrationService, Dairy.Infrastructure.HardwareServices.HardwareIntegrationService>();
+
+// Phase 3: KYC, Payments & Notifications
+builder.Services.AddScoped<IKycVerificationService, KycVerificationService>();
+builder.Services.AddScoped<IPaymentGatewayService, PaymentGatewayService>();
+
+// Phase 4: Advanced Analytics & Enterprise Features
+builder.Services.AddScoped<IBranchManagementService, BranchManagementService>();
+builder.Services.AddScoped<IMobileAppService, MobileAppService>();
 
 // Report Services
 builder.Services.AddScoped<ExcelReportService>();
@@ -184,6 +206,9 @@ app.MapControllers();
 
 // Default route to dashboard
 app.MapGet("/", () => Results.Redirect("/dashboard"));
+
+// Map feedback features endpoints
+Dairy.Web.FeedbackFeaturesEndpoints.MapFeedbackFeatures(app);
 
 // Basic API endpoints
 app.MapGet("/api/milk-collections", MilkCollectionEndpoints.List);

@@ -1,0 +1,243 @@
+@page
+@model NotificationCenterModel
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2><i class="fas fa-bell text-primary"></i> Notification Center</h2>
+        <p class="text-muted">Phase 3: SMS/WhatsApp templates and automated notifications</p>
+    </div>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#sendNotificationModal">
+        <i class="fas fa-paper-plane"></i> Send Notification
+    </button>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h5>SMS Sent Today</h5>
+                <h3>247</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <h5>WhatsApp Sent</h5>
+                <h3>189</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <h5>Email Sent</h5>
+                <h3>45</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h5>Delivery Rate</h5>
+                <h3>98.5%</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-history"></i> Recent Notifications</h5>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Recipient</th>
+                            <th>Message</th>
+                            <th>Status</th>
+                            <th>Sent At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><i class="fab fa-whatsapp text-success"></i> WhatsApp</td>
+                            <td>राहुल पाटील</td>
+                            <td>Payment notification - ₹15,000 credited</td>
+                            <td><span class="badge bg-success">Delivered</span></td>
+                            <td>10:35 AM</td>
+                        </tr>
+                        <tr>
+                            <td><i class="fas fa-sms text-primary"></i> SMS</td>
+                            <td>सुनील शर्मा</td>
+                            <td>Collection receipt - 12.5L milk</td>
+                            <td><span class="badge bg-success">Delivered</span></td>
+                            <td>10:30 AM</td>
+                        </tr>
+                        <tr>
+                            <td><i class="fab fa-whatsapp text-success"></i> WhatsApp</td>
+                            <td>अनिल कुमार</td>
+                            <td>Quality alert - Improve milk quality</td>
+                            <td><span class="badge bg-warning">Pending</span></td>
+                            <td>10:25 AM</td>
+                        </tr>
+                        <tr>
+                            <td><i class="fas fa-envelope text-info"></i> Email</td>
+                            <td>All Farmers</td>
+                            <td>Monthly statement and payment summary</td>
+                            <td><span class="badge bg-success">Sent</span></td>
+                            <td>09:00 AM</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-templates"></i> Message Templates</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h6>Collection Receipt</h6>
+                    <p class="small text-muted">दूध संग्रह रसीद<br>मात्रा: {quantity}L<br>राशि: ₹{amount}</p>
+                    <button class="btn btn-sm btn-outline-primary" onclick="useTemplate('collection')">Use</button>
+                </div>
+                <div class="mb-3">
+                    <h6>Payment Notification</h6>
+                    <p class="small text-muted">भुगतान सूचना<br>₹{amount} आपके खाते में जमा</p>
+                    <button class="btn btn-sm btn-outline-primary" onclick="useTemplate('payment')">Use</button>
+                </div>
+                <div class="mb-3">
+                    <h6>Quality Alert</h6>
+                    <p class="small text-muted">गुणवत्ता चेतावनी<br>दूध की गुणवत्ता सुधारें</p>
+                    <button class="btn btn-sm btn-outline-primary" onclick="useTemplate('quality')">Use</button>
+                </div>
+                <div class="mb-3">
+                    <h6>Monthly Statement</h6>
+                    <p class="small text-muted">मासिक विवरण<br>कुल दूध: {total}L</p>
+                    <button class="btn btn-sm btn-outline-primary" onclick="useTemplate('statement')">Use</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5><i class="fas fa-cog"></i> Auto Notifications</h5>
+            </div>
+            <div class="card-body">
+                <div class="form-check form-switch mb-2">
+                    <input class="form-check-input" type="checkbox" id="autoReceipt" checked>
+                    <label class="form-check-label" for="autoReceipt">
+                        Collection Receipts
+                    </label>
+                </div>
+                <div class="form-check form-switch mb-2">
+                    <input class="form-check-input" type="checkbox" id="autoPayment" checked>
+                    <label class="form-check-label" for="autoPayment">
+                        Payment Notifications
+                    </label>
+                </div>
+                <div class="form-check form-switch mb-2">
+                    <input class="form-check-input" type="checkbox" id="autoQuality">
+                    <label class="form-check-label" for="autoQuality">
+                        Quality Alerts
+                    </label>
+                </div>
+                <div class="form-check form-switch mb-2">
+                    <input class="form-check-input" type="checkbox" id="autoStatement" checked>
+                    <label class="form-check-label" for="autoStatement">
+                        Monthly Statements
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Send Notification Modal -->
+<div class="modal fade" id="sendNotificationModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5>Send Notification</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Notification Type</label>
+                    <select class="form-select" id="notificationType">
+                        <option value="sms">SMS</option>
+                        <option value="whatsapp">WhatsApp</option>
+                        <option value="email">Email</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Recipients</label>
+                    <select class="form-select" id="recipients">
+                        <option value="all">All Farmers</option>
+                        <option value="active">Active Farmers Only</option>
+                        <option value="specific">Specific Farmer</option>
+                    </select>
+                </div>
+                <div class="mb-3" id="specificFarmer" style="display: none;">
+                    <label class="form-label">Select Farmer</label>
+                    <select class="form-select">
+                        <option value="F001">राहुल पाटील (F001)</option>
+                        <option value="F002">सुनील शर्मा (F002)</option>
+                        <option value="F003">अनिल कुमार (F003)</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Message</label>
+                    <textarea class="form-control" id="messageText" rows="4" placeholder="Enter your message..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="sendNotification()">Send Notification</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('recipients').addEventListener('change', function() {
+    const specificDiv = document.getElementById('specificFarmer');
+    specificDiv.style.display = this.value === 'specific' ? 'block' : 'none';
+});
+
+function useTemplate(type) {
+    const templates = {
+        collection: 'दूध संग्रह रसीद\nमात्रा: {quantity} लीटर\nवसा: {fat}%\nSNF: {snf}%\nदर: ₹{rate}/लीटर\nकुल राशि: ₹{amount}',
+        payment: 'भुगतान सूचना\nप्रिय किसान,\n₹{amount} आपके खाते में जमा किया गया है।\nTransaction ID: {txnId}',
+        quality: 'गुणवत्ता चेतावनी\nआपके दूध की गुणवत्ता में सुधार की आवश्यकता है।\nवसा: {fat}%\nSNF: {snf}%',
+        statement: 'मासिक विवरण\nकुल दूध: {totalMilk} लीटर\nकुल भुगतान: ₹{totalPayment}\nऔसत वसा: {avgFat}%'
+    };
+    
+    document.getElementById('messageText').value = templates[type];
+}
+
+function sendNotification() {
+    const type = document.getElementById('notificationType').value;
+    const recipients = document.getElementById('recipients').value;
+    const message = document.getElementById('messageText').value;
+    
+    if (!message) {
+        alert('Please enter a message');
+        return;
+    }
+    
+    alert(`Notification sent successfully!\nType: ${type.toUpperCase()}\nRecipients: ${recipients}\nEstimated delivery: 2-5 minutes`);
+    
+    // Close modal and refresh
+    bootstrap.Modal.getInstance(document.getElementById('sendNotificationModal')).hide();
+    setTimeout(() => location.reload(), 1000);
+}
+</script>

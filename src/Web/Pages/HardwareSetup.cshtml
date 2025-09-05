@@ -93,6 +93,42 @@
         </div>
     </div>
 
+    <!-- RFID Reader -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-id-card"></i> RFID Reader</h5>
+                <span class="badge bg-secondary" id="rfidStatus">Disconnected</span>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">COM Port</label>
+                    <select class="form-select" id="rfidPort">
+                        <option value="">Select Port</option>
+                        <option value="COM13">COM13</option>
+                        <option value="COM14">COM14</option>
+                        <option value="COM15">COM15</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Last Card ID</label>
+                    <input type="text" class="form-control" id="lastCardId" readonly>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Farmer Name</label>
+                    <input type="text" class="form-control" id="farmerName" readonly>
+                </div>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary" onclick="connectRfid()">Connect</button>
+                    <button class="btn btn-success" onclick="scanCard()">Scan Card</button>
+                    <button class="btn btn-warning" onclick="writeCard()">Write Card</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
     <!-- Thermal Printer -->
     <div class="col-md-4">
         <div class="card">
@@ -271,5 +307,43 @@ function openDrawer() {
     setTimeout(() => {
         logMessage('Cash drawer opened');
     }, 500);
+}
+
+function connectRfid() {
+    const port = document.getElementById('rfidPort').value;
+    if (!port) {
+        alert('Please select a COM port');
+        return;
+    }
+    
+    logMessage(`Connecting to RFID reader on ${port}...`);
+    document.getElementById('rfidStatus').textContent = 'Connected';
+    document.getElementById('rfidStatus').className = 'badge bg-success';
+    logMessage('RFID reader connected successfully');
+}
+
+function scanCard() {
+    logMessage('Scanning for RFID card...');
+    setTimeout(() => {
+        const cardId = 'CARD' + Math.floor(Math.random() * 100000);
+        const farmer = 'राहुल पाटील';
+        
+        document.getElementById('lastCardId').value = cardId;
+        document.getElementById('farmerName').value = farmer;
+        
+        logMessage(`Card detected - ID: ${cardId}, Farmer: ${farmer}`);
+    }, 2000);
+}
+
+function writeCard() {
+    const farmerId = prompt('Enter Farmer ID:');
+    const farmerName = prompt('Enter Farmer Name:');
+    
+    if (farmerId && farmerName) {
+        logMessage(`Writing card data - ID: ${farmerId}, Name: ${farmerName}`);
+        setTimeout(() => {
+            logMessage('Card written successfully');
+        }, 3000);
+    }
 }
 </script>

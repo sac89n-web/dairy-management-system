@@ -56,54 +56,31 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td><strong>admin</strong></td>
-                        <td>System Administrator</td>
-                        <td>admin@dairy.com</td>
-                        <td><span class="badge bg-danger">Admin</span></td>
-                        <td><span class="badge bg-success">Active</span></td>
-                        <td>29/08/2025 16:30</td>
-                        <td>
-                            <button class="btn btn-sm btn-warning" onclick="editUser(1)">
-                                <i class="fas fa-edit"></i> Edit
-                            </button>
-                            <button class="btn btn-sm btn-info" onclick="updatePassword(1)">
-                                <i class="fas fa-key"></i> Update Password
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><strong>manager1</strong></td>
-                        <td>राहुल पाटील</td>
-                        <td>rahul@dairy.com</td>
-                        <td><span class="badge bg-primary">Manager</span></td>
-                        <td><span class="badge bg-success">Active</span></td>
-                        <td>28/08/2025 09:15</td>
-                        <td>
-                            <button class="btn btn-sm btn-warning" onclick="editUser(2)">
-                                <i class="fas fa-edit"></i> Edit
-                            </button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteUser(2)">
-                                <i class="fas fa-trash"></i> Delete
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><strong>operator1</strong></td>
-                        <td>सुनील शर्मा</td>
-                        <td>sunil@dairy.com</td>
-                        <td><span class="badge bg-success">Operator</span></td>
-                        <td><span class="badge bg-warning">Inactive</span></td>
-                        <td><span class="text-muted">Never</span></td>
-                        <td>
-                            <button class="btn btn-sm btn-warning" onclick="editUser(3)">
-                                <i class="fas fa-edit"></i> Edit
-                            </button>
-                            <button class="btn btn-sm btn-success" onclick="activateUser(3)">
-                                <i class="fas fa-check"></i> Activate
-                            </button>
-                        </td>
-                    </tr>
+                    @foreach(var user in Model.Users)
+                    {
+                        <tr>
+                            <td><strong>@user.Username</strong></td>
+                            <td>@user.FullName</td>
+                            <td>@user.Email</td>
+                            <td><span class="badge bg-@GetRoleBadgeColor((Dairy.Domain.UserRole)user.Role)">@((Dairy.Domain.UserRole)user.Role)</span></td>
+                            <td><span class="badge @(user.IsActive ? "bg-success" : "bg-warning")">@(user.IsActive ? "Active" : "Inactive")</span></td>
+                            <td>@(user.LastLoginAt?.ToString("dd/MM/yyyy HH:mm") ?? "Never")</td>
+                            <td>
+                                <button class="btn btn-sm btn-warning" onclick="editUser(@user.Id)">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                @if(user.Id != 1)
+                                {
+                                    <form method="post" asp-page-handler="ToggleUser" style="display:inline;">
+                                        <input type="hidden" name="userId" value="@user.Id" />
+                                        <button type="submit" class="btn btn-sm @(user.IsActive ? "btn-secondary" : "btn-success")">
+                                            <i class="fas @(user.IsActive ? "fa-pause" : "fa-play")"></i> @(user.IsActive ? "Deactivate" : "Activate")
+                                        </button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>

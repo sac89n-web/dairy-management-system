@@ -1,0 +1,269 @@
+@page
+@model EnhancedKycModel
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2><i class="fas fa-id-badge text-primary"></i> Enhanced KYC Verification</h2>
+        <p class="text-muted">Phase 3: Automated KYC with PAN, Aadhaar, Bank & GST verification</p>
+    </div>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#kycModal">
+        <i class="fas fa-plus"></i> Start KYC Process
+    </button>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h5>Verified Farmers</h5>
+                <h3>142</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <h5>Pending KYC</h5>
+                <h3>23</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-danger text-white">
+            <div class="card-body">
+                <h5>Failed KYC</h5>
+                <h3>8</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <h5>Bank Verified</h5>
+                <h3>135</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5><i class="fas fa-users"></i> Farmer KYC Status</h5>
+    </div>
+    <div class="card-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Farmer ID</th>
+                    <th>Name</th>
+                    <th>PAN Status</th>
+                    <th>Aadhaar Status</th>
+                    <th>Bank Status</th>
+                    <th>GST Status</th>
+                    <th>Overall Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>F001</td>
+                    <td>राहुल पाटील</td>
+                    <td><span class="badge bg-success">Verified</span></td>
+                    <td><span class="badge bg-success">Verified</span></td>
+                    <td><span class="badge bg-success">Verified</span></td>
+                    <td><span class="badge bg-success">Verified</span></td>
+                    <td><span class="badge bg-success">Complete</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-info" onclick="viewKyc('F001')">View</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>F002</td>
+                    <td>सुनील शर्मा</td>
+                    <td><span class="badge bg-success">Verified</span></td>
+                    <td><span class="badge bg-success">Verified</span></td>
+                    <td><span class="badge bg-warning">Pending</span></td>
+                    <td><span class="badge bg-secondary">N/A</span></td>
+                    <td><span class="badge bg-warning">Incomplete</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-warning" onclick="continueKyc('F002')">Continue</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>F003</td>
+                    <td>अनिल कुमार</td>
+                    <td><span class="badge bg-danger">Failed</span></td>
+                    <td><span class="badge bg-secondary">Pending</span></td>
+                    <td><span class="badge bg-secondary">Pending</span></td>
+                    <td><span class="badge bg-secondary">N/A</span></td>
+                    <td><span class="badge bg-danger">Failed</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-danger" onclick="retryKyc('F003')">Retry</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- KYC Modal -->
+<div class="modal fade" id="kycModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5>KYC Verification Process</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Farmer ID</label>
+                            <input type="text" class="form-control" id="farmerId" placeholder="F001">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">PAN Number</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="panNumber" placeholder="ABCDE1234F">
+                                <button class="btn btn-outline-primary" onclick="verifyPan()">Verify</button>
+                            </div>
+                            <div id="panResult" class="mt-2"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Aadhaar Number</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="aadhaarNumber" placeholder="1234 5678 9012">
+                                <button class="btn btn-outline-primary" onclick="verifyAadhaar()">Verify</button>
+                            </div>
+                            <div id="aadhaarResult" class="mt-2"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Bank Account Number</label>
+                            <input type="text" class="form-control" id="accountNumber" placeholder="1234567890">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">IFSC Code</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="ifscCode" placeholder="SBIN0001234">
+                                <button class="btn btn-outline-primary" onclick="verifyBank()">Verify</button>
+                            </div>
+                            <div id="bankResult" class="mt-2"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">GST Number (Optional)</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="gstNumber" placeholder="27ABCDE1234F1Z5">
+                                <button class="btn btn-outline-primary" onclick="verifyGst()">Verify</button>
+                            </div>
+                            <div id="gstResult" class="mt-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" onclick="completeKyc()">Complete KYC</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+async function verifyPan() {
+    const panNumber = document.getElementById('panNumber').value;
+    if (!panNumber) {
+        alert('Please enter PAN number');
+        return;
+    }
+    
+    const resultDiv = document.getElementById('panResult');
+    resultDiv.innerHTML = '<div class="spinner-border spinner-border-sm"></div> Verifying PAN...';
+    
+    // Simulate API call
+    setTimeout(() => {
+        if (panNumber.length === 10) {
+            resultDiv.innerHTML = '<div class="alert alert-success">✓ PAN verified: राहुल विनोद पाटील</div>';
+        } else {
+            resultDiv.innerHTML = '<div class="alert alert-danger">✗ Invalid PAN format</div>';
+        }
+    }, 2000);
+}
+
+async function verifyAadhaar() {
+    const aadhaarNumber = document.getElementById('aadhaarNumber').value.replace(/\s/g, '');
+    if (!aadhaarNumber) {
+        alert('Please enter Aadhaar number');
+        return;
+    }
+    
+    const resultDiv = document.getElementById('aadhaarResult');
+    resultDiv.innerHTML = '<div class="spinner-border spinner-border-sm"></div> Verifying Aadhaar...';
+    
+    setTimeout(() => {
+        if (aadhaarNumber.length === 12) {
+            resultDiv.innerHTML = '<div class="alert alert-success">✓ Aadhaar verified: राहुल विनोद पाटील</div>';
+        } else {
+            resultDiv.innerHTML = '<div class="alert alert-danger">✗ Invalid Aadhaar format</div>';
+        }
+    }, 2500);
+}
+
+async function verifyBank() {
+    const accountNumber = document.getElementById('accountNumber').value;
+    const ifscCode = document.getElementById('ifscCode').value;
+    
+    if (!accountNumber || !ifscCode) {
+        alert('Please enter both account number and IFSC code');
+        return;
+    }
+    
+    const resultDiv = document.getElementById('bankResult');
+    resultDiv.innerHTML = '<div class="spinner-border spinner-border-sm"></div> Verifying bank account (Penny Drop)...';
+    
+    setTimeout(() => {
+        if (ifscCode.length === 11) {
+            resultDiv.innerHTML = '<div class="alert alert-success">✓ Bank verified: RAHUL VINOD PATIL<br>Bank: State Bank of India<br>Penny Drop: ₹1.00 credited</div>';
+        } else {
+            resultDiv.innerHTML = '<div class="alert alert-danger">✗ Invalid IFSC code</div>';
+        }
+    }, 3000);
+}
+
+async function verifyGst() {
+    const gstNumber = document.getElementById('gstNumber').value;
+    if (!gstNumber) {
+        alert('Please enter GST number');
+        return;
+    }
+    
+    const resultDiv = document.getElementById('gstResult');
+    resultDiv.innerHTML = '<div class="spinner-border spinner-border-sm"></div> Verifying GST...';
+    
+    setTimeout(() => {
+        if (gstNumber.length === 15) {
+            resultDiv.innerHTML = '<div class="alert alert-success">✓ GST verified: Patil Dairy Farm<br>Status: Active</div>';
+        } else {
+            resultDiv.innerHTML = '<div class="alert alert-danger">✗ Invalid GST format</div>';
+        }
+    }, 1500);
+}
+
+function completeKyc() {
+    alert('KYC process completed successfully!');
+    location.reload();
+}
+
+function viewKyc(farmerId) {
+    alert('Viewing KYC details for farmer: ' + farmerId);
+}
+
+function continueKyc(farmerId) {
+    alert('Continuing KYC process for farmer: ' + farmerId);
+}
+
+function retryKyc(farmerId) {
+    alert('Retrying KYC process for farmer: ' + farmerId);
+}
+</script>

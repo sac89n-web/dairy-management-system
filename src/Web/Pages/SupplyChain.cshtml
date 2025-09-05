@@ -1,0 +1,596 @@
+@page
+@using Dairy.Web.Pages
+@model SupplyChainModel
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2><i class="fas fa-truck text-primary"></i> Supply Chain Management</h2>
+        <p class="text-muted">Track inventory, logistics, and supplier relationships</p>
+    </div>
+    <div>
+        <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#addInventoryModal">
+            <i class="fas fa-plus"></i> Add Inventory
+        </button>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSupplierModal">
+            <i class="fas fa-handshake"></i> Add Supplier
+        </button>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i>@TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- KPI Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h5><i class="fas fa-boxes"></i> Total Inventory</h5>
+                <h3>@Model.InventoryItems.Sum(x => x.CurrentStock)</h3>
+                <small>@Model.InventoryItems.Count items</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h5><i class="fas fa-truck-loading"></i> Active Shipments</h5>
+                <h3>@Model.Shipments.Count(x => x.Status == "In Transit")</h3>
+                <small>@Model.Shipments.Count total</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <h5><i class="fas fa-exclamation-triangle"></i> Low Stock Items</h5>
+                <h3>@Model.InventoryItems.Count(x => x.CurrentStock <= x.ReorderLevel)</h3>
+                <small>Need reorder</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <h5><i class="fas fa-handshake"></i> Active Suppliers</h5>
+                <h3>@Model.Suppliers.Count(x => x.IsActive)</h3>
+                <small>@Model.Suppliers.Count total</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Inventory Management -->
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-warehouse text-primary"></i> Inventory Overview</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Item</th>
+                                <th>Category</th>
+                                <th>Current Stock</th>
+                                <th>Reorder Level</th>
+                                <th>Unit Price</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.InventoryItems)
+                            {
+                                <tr class="@(item.CurrentStock <= item.ReorderLevel ? "table-warning" : "")">
+                                    <td>
+                                        <strong>@item.ItemName</strong><br>
+                                        <small class="text-muted">@item.ItemCode</small>
+                                    </td>
+                                    <td>@item.Category</td>
+                                    <td>
+                                        <span class="badge @(item.CurrentStock <= item.ReorderLevel ? "bg-warning" : "bg-success")">
+                                            @item.CurrentStock @item.Unit
+                                        </span>
+                                    </td>
+                                    <td>@item.ReorderLevel @item.Unit</td>
+                                    <td>₹@item.UnitPrice.ToString("N2")</td>
+                                    <td>
+                                        @if (item.CurrentStock <= item.ReorderLevel)
+                                        {
+                                            <span class="badge bg-warning">Low Stock</span>
+                                        }
+                                        else if (item.CurrentStock > item.ReorderLevel * 2)
+                                        {
+                                            <span class="badge bg-success">Well Stocked</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-info">Normal</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary" onclick="updateStock(@item.Id)">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-success" onclick="reorderItem(@item.Id)">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-pie text-success"></i> Stock Distribution</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="stockChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Shipments & Logistics -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-shipping-fast text-info"></i> Active Shipments</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Shipment ID</th>
+                                <th>From</th>
+                                <th>To</th>
+                                <th>Items</th>
+                                <th>Status</th>
+                                <th>Shipped Date</th>
+                                <th>Expected Delivery</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var shipment in Model.Shipments.OrderByDescending(x => x.ShippedDate))
+                            {
+                                <tr>
+                                    <td><strong>@shipment.ShipmentNumber</strong></td>
+                                    <td>@shipment.FromLocation</td>
+                                    <td>@shipment.ToLocation</td>
+                                    <td>@shipment.ItemCount items</td>
+                                    <td>
+                                        <span class="badge @(shipment.Status switch {
+                                            "Delivered" => "bg-success",
+                                            "In Transit" => "bg-primary",
+                                            "Pending" => "bg-warning",
+                                            "Cancelled" => "bg-danger",
+                                            _ => "bg-secondary"
+                                        })">@shipment.Status</span>
+                                    </td>
+                                    <td>@shipment.ShippedDate.ToString("dd/MM/yyyy")</td>
+                                    <td>@shipment.ExpectedDelivery?.ToString("dd/MM/yyyy")</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary" onclick="trackShipment('@shipment.ShipmentNumber')">
+                                            <i class="fas fa-map-marker-alt"></i> Track
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Suppliers -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-handshake text-warning"></i> Supplier Management</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Supplier</th>
+                                <th>Contact</th>
+                                <th>Category</th>
+                                <th>Rating</th>
+                                <th>Last Order</th>
+                                <th>Total Orders</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var supplier in Model.Suppliers)
+                            {
+                                <tr>
+                                    <td>
+                                        <strong>@supplier.SupplierName</strong><br>
+                                        <small class="text-muted">@supplier.SupplierCode</small>
+                                    </td>
+                                    <td>
+                                        @supplier.ContactPerson<br>
+                                        <small class="text-muted">@supplier.Phone</small>
+                                    </td>
+                                    <td>@supplier.Category</td>
+                                    <td>
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            <i class="fas fa-star @(i <= supplier.Rating ? "text-warning" : "text-muted")"></i>
+                                        }
+                                        <small>(@supplier.Rating.ToString("N1"))</small>
+                                    </td>
+                                    <td>@supplier.LastOrderDate?.ToString("dd/MM/yyyy")</td>
+                                    <td>@supplier.TotalOrders</td>
+                                    <td>
+                                        <span class="badge @(supplier.IsActive ? "bg-success" : "bg-secondary")">
+                                            @(supplier.IsActive ? "Active" : "Inactive")
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary" onclick="viewSupplier(@supplier.Id)">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-success" onclick="createOrder(@supplier.Id)">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Inventory Modal -->
+<div class="modal fade" id="addInventoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Inventory Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                @Html.AntiForgeryToken()
+                <form id="inventoryForm">
+                    <div class="mb-3">
+                        <label class="form-label">Select Item from Master</label>
+                        <select class="form-select" id="masterItem" onchange="populateItemDetails()" required>
+                            <option value="">-- Select Item --</option>
+                            @foreach (var item in Model.InventoryMaster)
+                            {
+                                <option value="@item.Id" data-name="@item.ItemName" data-code="@item.ItemCode" 
+                                        data-category="@item.Category" data-unit="@item.Unit" data-price="@item.StandardPrice">
+                                    @item.ItemName (@item.ItemCode)
+                                </option>
+                            }
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Item Name</label>
+                                <input type="text" class="form-control" id="itemName" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Item Code</label>
+                                <input type="text" class="form-control" id="itemCode" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Category</label>
+                                <input type="text" class="form-control" id="category" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Unit</label>
+                                <input type="text" class="form-control" id="unit" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Standard Price (₹)</label>
+                                <input type="number" class="form-control" id="standardPrice" step="0.01" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Current Stock</label>
+                                <input type="number" class="form-control" id="currentStock" min="0" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Reorder Level</label>
+                                <input type="number" class="form-control" id="reorderLevel" min="0" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Actual Unit Price (₹)</label>
+                                <input type="number" class="form-control" id="unitPrice" step="0.01" min="0" required>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveInventoryItem()">Save Item</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Supplier Modal -->
+<div class="modal fade" id="addSupplierModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Supplier</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                @Html.AntiForgeryToken()
+                <form id="supplierForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Supplier Name</label>
+                                <input type="text" class="form-control" id="supplierName" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Supplier Code</label>
+                                <input type="text" class="form-control" id="supplierCode" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Contact Person</label>
+                                <input type="text" class="form-control" id="contactPerson" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Phone</label>
+                                <input type="tel" class="form-control" id="phone" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Address</label>
+                        <textarea class="form-control" id="address" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Category</label>
+                        <select class="form-select" id="supplierCategory">
+                            <option value="Feed Supplier">Feed Supplier</option>
+                            <option value="Medicine Supplier">Medicine Supplier</option>
+                            <option value="Equipment Supplier">Equipment Supplier</option>
+                            <option value="Packaging Supplier">Packaging Supplier</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveSupplier()">Save Supplier</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Stock Distribution Chart
+const ctx = document.getElementById('stockChart').getContext('2d');
+const stockChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: @Html.Raw(Json.Serialize(Model.InventoryItems.GroupBy(x => x.Category).Select(g => g.Key).ToArray())),
+        datasets: [{
+            data: @Html.Raw(Json.Serialize(Model.InventoryItems.GroupBy(x => x.Category).Select(g => g.Sum(i => i.CurrentStock)).ToArray())),
+            backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1']
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+
+function updateStock(itemId) {
+    const newStock = prompt('Enter new stock quantity:');
+    if (newStock && !isNaN(newStock)) {
+        alert(`Stock updated for item #${itemId} to ${newStock} units`);
+        location.reload();
+    }
+}
+
+function reorderItem(itemId) {
+    alert(`Reorder initiated for item #${itemId}`);
+}
+
+function trackShipment(shipmentNumber) {
+    alert(`Tracking shipment: ${shipmentNumber}`);
+}
+
+function viewSupplier(supplierId) {
+    alert(`Viewing supplier #${supplierId}`);
+}
+
+function createOrder(supplierId) {
+    alert(`Creating order for supplier #${supplierId}`);
+}
+
+function populateItemDetails() {
+    const select = document.getElementById('masterItem');
+    const selectedOption = select.options[select.selectedIndex];
+    
+    if (selectedOption.value) {
+        document.getElementById('itemName').value = selectedOption.dataset.name;
+        document.getElementById('itemCode').value = selectedOption.dataset.code;
+        document.getElementById('category').value = selectedOption.dataset.category;
+        document.getElementById('unit').value = selectedOption.dataset.unit;
+        document.getElementById('standardPrice').value = selectedOption.dataset.price;
+        document.getElementById('unitPrice').value = selectedOption.dataset.price;
+    } else {
+        // Clear fields if no item selected
+        document.getElementById('itemName').value = '';
+        document.getElementById('itemCode').value = '';
+        document.getElementById('category').value = '';
+        document.getElementById('unit').value = '';
+        document.getElementById('standardPrice').value = '';
+        document.getElementById('unitPrice').value = '';
+    }
+}
+
+function saveInventoryItem() {
+    const masterItemId = document.getElementById('masterItem').value;
+    const itemName = document.getElementById('itemName').value;
+    const itemCode = document.getElementById('itemCode').value;
+    const currentStock = document.getElementById('currentStock').value;
+    const reorderLevel = document.getElementById('reorderLevel').value;
+    const unitPrice = document.getElementById('unitPrice').value;
+    
+    if (!masterItemId || !currentStock || !reorderLevel || !unitPrice) {
+        alert('Please fill all required fields');
+        return;
+    }
+    
+    // Create form data for submission
+    const formData = new FormData();
+    formData.append('masterItemId', masterItemId);
+    formData.append('currentStock', currentStock);
+    formData.append('reorderLevel', reorderLevel);
+    formData.append('unitPrice', unitPrice);
+    
+    // Submit via fetch API
+    fetch('/SupplyChain?handler=AddInventory', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            // Reset form and close modal
+            document.getElementById('inventoryForm').reset();
+            document.getElementById('addInventoryModal').querySelector('.btn-close').click();
+            
+            // Show success message and reload
+            alert(`Inventory item added successfully: ${itemName} (${itemCode})`);
+            location.reload();
+        } else {
+            alert('Error adding inventory item. Please try again.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error adding inventory item. Please try again.');
+    });
+}
+
+function saveSupplier() {
+    const supplierName = document.getElementById('supplierName').value;
+    const supplierCode = document.getElementById('supplierCode').value;
+    const contactPerson = document.getElementById('contactPerson').value;
+    const phone = document.getElementById('phone').value;
+    
+    if (!supplierName || !supplierCode || !contactPerson || !phone) {
+        alert('Please fill all required fields');
+        return;
+    }
+    
+    // Create form data for submission
+    const formData = new FormData();
+    formData.append('supplierName', supplierName);
+    formData.append('supplierCode', supplierCode);
+    formData.append('contactPerson', contactPerson);
+    formData.append('phone', phone);
+    formData.append('email', document.getElementById('email').value);
+    formData.append('address', document.getElementById('address').value);
+    formData.append('category', document.getElementById('supplierCategory').value);
+    
+    // Submit via fetch API
+    fetch('/SupplyChain?handler=AddSupplier', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            // Reset form and close modal
+            document.getElementById('supplierForm').reset();
+            document.getElementById('addSupplierModal').querySelector('.btn-close').click();
+            
+            // Show success message and reload
+            alert(`Supplier added successfully: ${supplierName} (${supplierCode})`);
+            location.reload();
+        } else {
+            alert('Error adding supplier. Please try again.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error adding supplier. Please try again.');
+    });
+}
+</script>

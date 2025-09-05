@@ -1,0 +1,218 @@
+@page
+@model MobileAppModel
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2><i class="fas fa-mobile-alt text-primary"></i> Mobile App Management</h2>
+        <p class="text-muted">Manage mobile users, sync data, and push notifications</p>
+    </div>
+    <div>
+        <button class="btn btn-success me-2" onclick="sendBulkNotification()">
+            <i class="fas fa-bullhorn"></i> Send Notification
+        </button>
+        <button class="btn btn-primary" onclick="refreshData()">
+            <i class="fas fa-sync"></i> Refresh
+        </button>
+    </div>
+</div>
+
+<!-- Mobile App Stats -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h5>Active Users</h5>
+                <h3>@Model.MobileUsers.Count(u => u.IsActive)</h3>
+                <small>@Model.MobileUsers.Count(u => u.UserType == "farmer") Farmers | @Model.MobileUsers.Count(u => u.UserType == "field_officer") Officers</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h5>Today's Syncs</h5>
+                <h3>@Model.MobileUsers.Count(u => u.LastSync?.Date == DateTime.Today)</h3>
+                <small>Data synchronizations</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <h5>App Versions</h5>
+                <h3>@Model.MobileUsers.Select(u => u.AppVersion).Distinct().Count()</h3>
+                <small>Different versions</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <h5>Offline Users</h5>
+                <h3>@Model.MobileUsers.Count(u => u.LastSync == null || u.LastSync < DateTime.Now.AddDays(-1))</h3>
+                <small>Not synced recently</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile Users Table -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5><i class="fas fa-users"></i> Mobile App Users</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>User Type</th>
+                        <th>Device ID</th>
+                        <th>App Version</th>
+                        <th>Last Sync</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach(var user in Model.MobileUsers)
+                    {
+                        <tr>
+                            <td>
+                                <span class="badge @(user.UserType == "farmer" ? "bg-success" : "bg-primary")">
+                                    @user.UserType.Replace("_", " ").ToUpper()
+                                </span>
+                            </td>
+                            <td><code>@user.DeviceId</code></td>
+                            <td>@user.AppVersion</td>
+                            <td>
+                                @if(user.LastSync.HasValue)
+                                {
+                                    <span>@user.LastSync.Value.ToString("dd/MM/yyyy HH:mm")</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Never</span>
+                                }
+                            </td>
+                            <td>
+                                <span class="badge @(user.IsActive ? "bg-success" : "bg-secondary")">
+                                    @(user.IsActive ? "Active" : "Inactive")
+                                </span>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary" onclick="sendNotification(@user.Id)">
+                                    <i class="fas fa-bell"></i> Notify
+                                </button>
+                                <button class="btn btn-sm btn-outline-info" onclick="viewUserDetails(@user.Id)">
+                                    <i class="fas fa-eye"></i> Details
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile Dashboard Preview -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-mobile"></i> Farmer App Dashboard</h5>
+            </div>
+            <div class="card-body">
+                <div class="mobile-preview bg-dark text-white p-3 rounded">
+                    <div class="text-center mb-3">
+                        <h6>Dairy Pro - Farmer</h6>
+                    </div>
+                    <div class="row text-center mb-3">
+                        <div class="col-6">
+                            <div class="bg-primary p-2 rounded">
+                                <small>Today's Collection</small>
+                                <div><strong>@Model.Dashboard.Stats.TodayCollection.ToString("F1")L</strong></div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="bg-success p-2 rounded">
+                                <small>Quality Score</small>
+                                <div><strong>@Model.Dashboard.Stats.AverageQuality.ToString("F1")%</strong></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <small class="text-muted">Recent Activities</small>
+                        @foreach(var activity in Model.Dashboard.RecentActivities.Take(2))
+                        {
+                            <div class="bg-secondary p-2 rounded mb-1">
+                                <small>@activity.Description</small><br>
+                                <small class="text-muted">@activity.Timestamp.ToString("HH:mm")</small>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-bar"></i> App Usage Analytics</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="appUsageChart" height="150"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// App Usage Chart
+const appUsageCtx = document.getElementById('appUsageChart').getContext('2d');
+new Chart(appUsageCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Farmers', 'Field Officers', 'Admins'],
+        datasets: [{
+            data: [
+                @Model.MobileUsers.Count(u => u.UserType == "farmer"),
+                @Model.MobileUsers.Count(u => u.UserType == "field_officer"),
+                @Model.MobileUsers.Count(u => u.UserType == "admin")
+            ],
+            backgroundColor: ['#28a745', '#007bff', '#dc3545']
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { position: 'bottom' }
+        }
+    }
+});
+
+function sendNotification(userId) {
+    const message = prompt('Enter notification message:');
+    if (message) {
+        // API call to send notification
+        alert(`Notification sent to user ${userId}: ${message}`);
+    }
+}
+
+function sendBulkNotification() {
+    const message = prompt('Enter bulk notification message:');
+    if (message) {
+        alert(`Bulk notification sent to all active users: ${message}`);
+    }
+}
+
+function viewUserDetails(userId) {
+    alert(`Viewing details for user ${userId}`);
+}
+
+function refreshData() {
+    location.reload();
+}
+</script>
